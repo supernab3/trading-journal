@@ -1,0 +1,3342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trading Journal</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --shell: #101820;
+      --shell-soft: #172331;
+      --surface: #ffffff;
+      --surface-muted: #f7f9fb;
+      --text: #141b24;
+      --muted: #647180;
+      --line: #dfe5ec;
+      --line-strong: #c7d1dc;
+      --primary: #147d8f;
+      --primary-dark: #0f6372;
+      --green: #10805b;
+      --green-soft: #e8f7f1;
+      --red: #c44040;
+      --red-soft: #fdeceb;
+      --amber: #b7791f;
+      --amber-soft: #fff5df;
+      --shadow: 0 18px 45px rgba(17, 24, 39, 0.12);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, var(--shell) 0, var(--shell) 278px, var(--bg) 278px, var(--bg) 100%),
+        linear-gradient(135deg, rgba(20, 125, 143, 0.14), rgba(183, 121, 31, 0.10));
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    a {
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .app-shell {
+      margin: 0 auto;
+      padding: 28px 0 36px;
+      width: min(1220px, calc(100% - 32px));
+    }
+
+    .topbar {
+      align-items: flex-end;
+      color: #ffffff;
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow {
+      color: #76d0df;
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      margin: 0 0 8px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4.6vw, 3.4rem);
+      line-height: 1;
+      margin: 0;
+    }
+
+    .subtitle {
+      color: #aab8c7;
+      font-size: 0.98rem;
+      margin: 10px 0 0;
+      max-width: 620px;
+    }
+
+    .storage-dot {
+      background: #21c58a;
+      border-radius: 999px;
+      box-shadow: 0 0 0 4px rgba(33, 197, 138, 0.12);
+      height: 8px;
+      width: 8px;
+    }
+
+    .user-actions {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .user-pill {
+      align-items: center;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      color: #d9e2ea;
+      display: inline-flex;
+      font-size: 0.88rem;
+      font-weight: 800;
+      gap: 8px;
+      max-width: min(340px, 100%);
+      overflow: hidden;
+      padding: 9px 13px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .auth-shell {
+      align-items: center;
+      display: grid;
+      min-height: 100vh;
+      padding: 28px 0;
+    }
+
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid rgba(223, 229, 236, 0.95);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin: 0 auto;
+      overflow: hidden;
+      width: min(460px, calc(100% - 32px));
+    }
+
+    .auth-card-header {
+      background: linear-gradient(180deg, #ffffff, var(--surface-muted));
+      border-bottom: 1px solid var(--line);
+      padding: 22px;
+    }
+
+    .auth-card-header h1 {
+      color: var(--text);
+      font-size: 1.8rem;
+      line-height: 1.08;
+    }
+
+    .auth-card-header .subtitle {
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 14px;
+      padding: 20px 22px 22px;
+    }
+
+    .auth-switch {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 750;
+      text-align: center;
+    }
+
+    .auth-switch button {
+      background: transparent;
+      border: 0;
+      color: var(--primary);
+      font-weight: 900;
+      padding: 0;
+    }
+
+    .loading-state {
+      color: var(--muted);
+      font-weight: 850;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .panel.loading-state {
+      margin-bottom: 18px;
+    }
+
+    .stats-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid rgba(223, 229, 236, 0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      min-height: 138px;
+      overflow: hidden;
+      padding: 18px;
+      position: relative;
+    }
+
+    .stat-card::before {
+      content: "";
+      height: 4px;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+
+    .stat-primary::before {
+      background: var(--primary);
+    }
+
+    .stat-green::before {
+      background: var(--green);
+    }
+
+    .stat-red::before {
+      background: var(--red);
+    }
+
+    .stat-amber::before {
+      background: var(--amber);
+    }
+
+    .stat-header {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .stat-chip {
+      background: var(--surface-muted);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 5px 8px;
+    }
+
+    .stat-value {
+      font-size: clamp(1.55rem, 3vw, 2.25rem);
+      font-weight: 900;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+
+    .stat-detail {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-top: 10px;
+      min-height: 20px;
+    }
+
+    .profit {
+      color: var(--green);
+    }
+
+    .loss {
+      color: var(--red);
+    }
+
+    .neutral {
+      color: var(--muted);
+    }
+
+    .main-grid {
+      align-items: start;
+      display: grid;
+      gap: 18px;
+      grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid rgba(223, 229, 236, 0.95);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      align-items: center;
+      background: linear-gradient(180deg, #ffffff, var(--surface-muted));
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      justify-content: space-between;
+      padding: 17px 18px 14px;
+    }
+
+    .panel-header h2 {
+      font-size: 1rem;
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .panel-meta {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .filters-panel {
+      margin-bottom: 18px;
+    }
+
+    .filters-grid {
+      align-items: end;
+      display: grid;
+      gap: 12px;
+      grid-template-columns: minmax(210px, 1.35fr) repeat(4, minmax(135px, 1fr)) auto;
+      padding: 16px 18px;
+    }
+
+    .filters-grid .btn {
+      min-height: 42px;
+      white-space: nowrap;
+    }
+
+    .advanced-panel {
+      margin-bottom: 18px;
+    }
+
+    .advanced-stats-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      padding: 16px 18px;
+    }
+
+    .advanced-stats-grid .stat-card {
+      box-shadow: none;
+      min-height: 126px;
+    }
+
+    .chart-panel {
+      margin-bottom: 18px;
+    }
+
+    .chart-summary {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+    }
+
+    .chart-summary strong {
+      font-size: 1rem;
+      font-weight: 900;
+    }
+
+    .charts-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      padding: 16px 18px 18px;
+    }
+
+    .chart-card {
+      background: var(--surface-muted);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .chart-card h3 {
+      font-size: 0.92rem;
+      font-weight: 900;
+      margin: 0 0 12px;
+    }
+
+    .chart-canvas-wrap {
+      height: 310px;
+      position: relative;
+    }
+
+    .chart-canvas-wrap canvas {
+      height: 100% !important;
+      width: 100% !important;
+    }
+
+    .chart-empty {
+      align-items: center;
+      color: var(--muted);
+      display: flex;
+      font-size: 0.92rem;
+      font-weight: 800;
+      inset: 0;
+      justify-content: center;
+      pointer-events: none;
+      position: absolute;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .backup-panel {
+      margin-bottom: 18px;
+    }
+
+    .backup-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 16px 18px;
+    }
+
+    .backup-actions .btn {
+      min-width: 140px;
+    }
+
+    .hidden-file-input {
+      display: none;
+    }
+
+    .upload-row {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .upload-hint {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .screenshot-preview-card {
+      align-items: center;
+      background: var(--surface-muted);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+    }
+
+    .screenshot-preview-card img {
+      aspect-ratio: 16 / 10;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      object-fit: cover;
+      width: 120px;
+    }
+
+    .screenshot-preview-meta {
+      color: var(--muted);
+      display: grid;
+      flex: 1;
+      font-size: 0.84rem;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .screenshot-preview-meta strong {
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .trade-form {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      color: #31404f;
+      font-size: 0.82rem;
+      font-weight: 850;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      background: #fbfcfe;
+      border: 1px solid #cbd5df;
+      border-radius: 7px;
+      color: var(--text);
+      min-height: 42px;
+      outline: none;
+      padding: 10px 12px;
+      width: 100%;
+    }
+
+    .field textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(20, 125, 143, 0.15);
+    }
+
+    .field-row {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .error-box {
+      background: var(--red-soft);
+      border: 1px solid rgba(196, 64, 64, 0.24);
+      border-radius: 7px;
+      color: var(--red);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 10px 12px;
+    }
+
+    .status-box {
+      border-top: 1px solid var(--line);
+      font-size: 0.9rem;
+      font-weight: 800;
+      padding: 12px 18px;
+    }
+
+    .status-success {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .status-error {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    .btn {
+      align-items: center;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      display: inline-flex;
+      font-weight: 850;
+      gap: 8px;
+      justify-content: center;
+      min-height: 40px;
+      padding: 10px 13px;
+      transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      text-decoration: none;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      border-color: var(--line-strong);
+      color: #2d3a45;
+    }
+
+    .btn-secondary:hover {
+      border-color: #9eacba;
+    }
+
+    .btn-danger {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .btn-small {
+      min-height: 34px;
+      padding: 7px 10px;
+    }
+
+    .table-panel {
+      min-width: 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      min-width: 1240px;
+      width: 100%;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 13px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef3f7;
+      color: #526071;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    td {
+      color: #283541;
+      font-size: 0.9rem;
+    }
+
+    tbody tr:hover {
+      background: #fbfcfe;
+    }
+
+    .symbol-cell {
+      color: var(--text);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .type-badge {
+      border-radius: 999px;
+      display: inline-flex;
+      font-size: 0.72rem;
+      font-weight: 900;
+      padding: 5px 9px;
+      text-transform: uppercase;
+    }
+
+    .type-long {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .type-short {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .risk-badge {
+      border-radius: 999px;
+      display: inline-flex;
+      font-size: 0.72rem;
+      font-weight: 900;
+      padding: 5px 9px;
+      white-space: nowrap;
+    }
+
+    .risk-ok {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .risk-warning {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .notes-cell {
+      color: var(--muted);
+      max-width: 210px;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .screenshot-cell {
+      min-width: 92px;
+    }
+
+    .thumbnail-button {
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+      display: inline-flex;
+      padding: 0;
+    }
+
+    .thumbnail-button:focus {
+      box-shadow: 0 0 0 3px rgba(20, 125, 143, 0.18);
+      outline: none;
+    }
+
+    .trade-thumbnail {
+      aspect-ratio: 16 / 10;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      object-fit: cover;
+      width: 78px;
+    }
+
+    .screenshot-links {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .actions-cell {
+      display: flex;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .empty-state {
+      color: var(--muted);
+      padding: 46px 24px;
+      text-align: center;
+    }
+
+    .empty-state strong {
+      color: var(--text);
+      display: block;
+      font-size: 1.05rem;
+      margin-bottom: 7px;
+    }
+
+    .modal-backdrop {
+      align-items: center;
+      background: rgba(16, 24, 32, 0.72);
+      display: flex;
+      inset: 0;
+      justify-content: center;
+      padding: 18px;
+      position: fixed;
+      z-index: 20;
+    }
+
+    .modal-panel {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+      max-height: min(92vh, 900px);
+      overflow: hidden;
+      width: min(980px, 100%);
+    }
+
+    .modal-header {
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      padding: 14px 16px;
+    }
+
+    .modal-title {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .modal-title strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .modal-title span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .modal-body {
+      background: #0f1720;
+      display: grid;
+      max-height: calc(92vh - 72px);
+      place-items: center;
+      padding: 14px;
+    }
+
+    .modal-body img {
+      border-radius: 6px;
+      max-height: calc(92vh - 104px);
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    @media (max-width: 1060px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .filters-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .advanced-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
+        display: block;
+      }
+
+      table {
+        min-width: 0;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tbody {
+        display: grid;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      tbody tr {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      tbody tr:hover {
+        background: var(--surface);
+      }
+
+      td {
+        align-items: start;
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        gap: 12px;
+        grid-template-columns: minmax(96px, 34%) minmax(0, 1fr);
+        padding: 10px 12px;
+      }
+
+      td::before {
+        color: var(--muted);
+        content: attr(data-label);
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      td:last-child {
+        border-bottom: 0;
+      }
+
+      .notes-cell {
+        max-width: none;
+      }
+
+      .screenshot-cell {
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        background:
+          linear-gradient(180deg, var(--shell) 0, var(--shell) 350px, var(--bg) 350px, var(--bg) 100%),
+          linear-gradient(135deg, rgba(20, 125, 143, 0.14), rgba(183, 121, 31, 0.10));
+      }
+
+      .app-shell {
+        padding: 22px 0;
+        width: min(100% - 22px, 1220px);
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .user-actions,
+      .user-pill {
+        width: 100%;
+      }
+
+      .user-actions {
+        justify-content: flex-start;
+      }
+
+      .stats-grid,
+      .field-row,
+      .filters-grid,
+      .advanced-stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-card,
+      .panel-header,
+      .trade-form {
+        padding: 15px;
+      }
+
+      .form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .backup-actions .btn {
+        min-width: 0;
+      }
+
+      .charts-grid {
+        padding: 14px;
+      }
+
+      .chart-canvas-wrap {
+        height: 260px;
+      }
+
+      .upload-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .screenshot-preview-card {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .screenshot-preview-card img {
+        width: 100%;
+      }
+
+      .modal-backdrop {
+        padding: 10px;
+      }
+
+      td {
+        grid-template-columns: 1fr;
+        gap: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useEffect, useMemo, useRef, useState } = React;
+    const SUPABASE_URL = "https://spuqofvejpbktfuwiwsy.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_BxzvNWXpNDLkPiYpRNtvNQ_4Pd83yqi";
+    const TRADES_TABLE = "trades";
+    const SUPABASE_KEY_IS_SECRET = SUPABASE_ANON_KEY.startsWith("sb_secret_");
+    const SUPABASE_IS_CONFIGURED =
+      SUPABASE_URL.startsWith("https://") &&
+      !SUPABASE_URL.includes("YOUR-PROJECT-REF") &&
+      !SUPABASE_ANON_KEY.includes("YOUR-SUPABASE-PUBLISHABLE-OR-ANON-KEY") &&
+      !SUPABASE_KEY_IS_SECRET;
+    const supabaseClient =
+      SUPABASE_IS_CONFIGURED && window.supabase
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        : null;
+    const MAX_SCREENSHOT_SIZE_BYTES = 750 * 1024;
+    const MAX_SCREENSHOT_DATA_URL_LENGTH = Math.ceil(MAX_SCREENSHOT_SIZE_BYTES * 1.4);
+    const ALLOWED_SCREENSHOT_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    const RISK_WARNING_PERCENT = 2;
+    const DEFAULT_FILTERS = {
+      search: "",
+      result: "all",
+      tradeType: "all",
+      startDate: "",
+      endDate: ""
+    };
+
+    function getTodayDate() {
+      const today = new Date();
+      const localTime = today.getTime() - today.getTimezoneOffset() * 60000;
+      return new Date(localTime).toISOString().slice(0, 10);
+    }
+
+    function getDefaultForm() {
+      return {
+        symbol: "",
+        type: "long",
+        entryPrice: "",
+        exitPrice: "",
+        positionSize: "",
+        accountBalanceBefore: "",
+        riskAmount: "",
+        stopLossPrice: "",
+        takeProfitPrice: "",
+        date: getTodayDate(),
+        emotion: "",
+        notes: "",
+        screenshotUrl: "",
+        screenshotImage: null
+      };
+    }
+
+    function getSupabaseSetupError() {
+      if (SUPABASE_KEY_IS_SECRET) {
+        return "Do not use an sb_secret key in this browser app. Use a Supabase publishable key or legacy anon key instead.";
+      }
+
+      if (!SUPABASE_IS_CONFIGURED) {
+        return "Add your Supabase publishable key or legacy anon key in index.html before using the online journal.";
+      }
+
+      if (!window.supabase) {
+        return "Supabase could not load. Check your internet connection and refresh the page.";
+      }
+
+      return "";
+    }
+
+    function parseTradeNumber(value) {
+      if (typeof value === "string" && value.trim() === "") {
+        return NaN;
+      }
+
+      if (typeof value !== "string" && typeof value !== "number") {
+        return NaN;
+      }
+
+      const number = Number(value);
+      return Number.isFinite(number) ? number : NaN;
+    }
+
+    function parseOptionalTradeNumber(value) {
+      if (value === null || value === undefined || value === "") {
+        return null;
+      }
+
+      if (typeof value === "string" && value.trim() === "") {
+        return null;
+      }
+
+      const number = parseTradeNumber(value);
+      return Number.isFinite(number) && number > 0 ? number : null;
+    }
+
+    function hasValidTradeNumbers(trade) {
+      return trade.entryPrice > 0 && trade.exitPrice > 0 && trade.positionSize > 0;
+    }
+
+    function isValidDateString(value) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        return false;
+      }
+
+      const [year, month, day] = value.split("-").map(Number);
+      const date = new Date(Date.UTC(year, month - 1, day));
+      return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+    }
+
+    function normalizeTradeDate(value) {
+      const date = String(value || "").trim();
+      return isValidDateString(date) ? date : getTodayDate();
+    }
+
+    function formatFileSize(bytes) {
+      if (!Number.isFinite(bytes)) {
+        return "0 KB";
+      }
+
+      return bytes >= 1024 * 1024
+        ? `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+        : `${Math.ceil(bytes / 1024)} KB`;
+    }
+
+    function isValidScreenshotImage(image) {
+      return Boolean(
+        image &&
+        typeof image === "object" &&
+        typeof image.dataUrl === "string" &&
+        image.dataUrl.startsWith("data:image/") &&
+        ALLOWED_SCREENSHOT_TYPES.includes(image.type) &&
+        Number.isFinite(image.size) &&
+        image.size > 0 &&
+        image.size <= MAX_SCREENSHOT_SIZE_BYTES &&
+        image.dataUrl.length <= MAX_SCREENSHOT_DATA_URL_LENGTH
+      );
+    }
+
+    function normalizeScreenshotImage(image) {
+      if (!isValidScreenshotImage(image)) {
+        return null;
+      }
+
+      return {
+        name: String(image.name || "chart-screenshot").trim().slice(0, 120),
+        type: image.type,
+        size: image.size,
+        dataUrl: image.dataUrl
+      };
+    }
+
+    function roundTo(value, decimals = 2) {
+      const multiplier = 10 ** decimals;
+      const rounded = Math.round((value + Number.EPSILON) * multiplier) / multiplier;
+      return Object.is(rounded, -0) ? 0 : rounded;
+    }
+
+    function roundToCurrency(value) {
+      return roundTo(value, 2);
+    }
+
+    function normalizeTrade(trade) {
+      if (!trade || typeof trade !== "object") {
+        return null;
+      }
+
+      const normalizedTrade = {
+        id: trade.id || createTradeId(),
+        symbol: String(trade.symbol || "").trim().toUpperCase(),
+        type: trade.type === "short" ? "short" : "long",
+        entryPrice: parseTradeNumber(trade.entryPrice),
+        exitPrice: parseTradeNumber(trade.exitPrice),
+        positionSize: parseTradeNumber(trade.positionSize),
+        accountBalanceBefore: parseOptionalTradeNumber(trade.accountBalanceBefore),
+        riskAmount: parseOptionalTradeNumber(trade.riskAmount),
+        stopLossPrice: parseOptionalTradeNumber(trade.stopLossPrice),
+        takeProfitPrice: parseOptionalTradeNumber(trade.takeProfitPrice),
+        date: normalizeTradeDate(trade.date),
+        emotion: String(trade.emotion || "").trim(),
+        notes: String(trade.notes || "").trim(),
+        screenshotUrl: String(trade.screenshotUrl || "").trim(),
+        screenshotImage: normalizeScreenshotImage(trade.screenshotImage)
+      };
+
+      if (!normalizedTrade.symbol || !hasValidTradeNumbers(normalizedTrade)) {
+        return null;
+      }
+
+      return normalizedTrade;
+    }
+
+    function toTradeRow(trade, userId) {
+      const normalizedTrade = normalizeTrade(trade);
+
+      if (!normalizedTrade || !userId) {
+        return null;
+      }
+
+      return {
+        user_id: userId,
+        symbol: normalizedTrade.symbol,
+        trade_type: normalizedTrade.type,
+        entry_price: normalizedTrade.entryPrice,
+        exit_price: normalizedTrade.exitPrice,
+        position_size: normalizedTrade.positionSize,
+        account_balance_before: normalizedTrade.accountBalanceBefore,
+        risk_amount: normalizedTrade.riskAmount,
+        stop_loss_price: normalizedTrade.stopLossPrice,
+        take_profit_price: normalizedTrade.takeProfitPrice,
+        trade_date: normalizedTrade.date,
+        emotion: normalizedTrade.emotion,
+        notes: normalizedTrade.notes,
+        screenshot_url: normalizedTrade.screenshotUrl,
+        screenshot_image: normalizedTrade.screenshotImage
+      };
+    }
+
+    function fromTradeRow(row) {
+      return normalizeTrade({
+        id: row.id,
+        symbol: row.symbol,
+        type: row.trade_type,
+        entryPrice: row.entry_price,
+        exitPrice: row.exit_price,
+        positionSize: row.position_size,
+        accountBalanceBefore: row.account_balance_before,
+        riskAmount: row.risk_amount,
+        stopLossPrice: row.stop_loss_price,
+        takeProfitPrice: row.take_profit_price,
+        date: row.trade_date,
+        emotion: row.emotion,
+        notes: row.notes,
+        screenshotUrl: row.screenshot_url,
+        screenshotImage: row.screenshot_image
+      });
+    }
+
+    function ensureUniqueTradeIds(trades) {
+      const usedIds = new Set();
+
+      return trades.map((trade) => {
+        const baseId = String(trade.id || "").trim() || createTradeId();
+        let id = baseId;
+        let suffix = 1;
+
+        while (usedIds.has(id)) {
+          id = `${baseId}-${suffix}`;
+          suffix += 1;
+        }
+
+        usedIds.add(id);
+        return { ...trade, id };
+      });
+    }
+
+    function calculatePriceMove(trade) {
+      return trade.type === "short"
+        ? trade.entryPrice - trade.exitPrice
+        : trade.exitPrice - trade.entryPrice;
+    }
+
+    function calculateProfitLoss(trade) {
+      if (!hasValidTradeNumbers(trade)) {
+        return 0;
+      }
+
+      return roundToCurrency(calculatePriceMove(trade) * trade.positionSize);
+    }
+
+    function calculateProfitLossPercent(trade) {
+      if (!hasValidTradeNumbers(trade)) {
+        return 0;
+      }
+
+      return roundTo((calculatePriceMove(trade) / trade.entryPrice) * 100, 4);
+    }
+
+    function calculateRiskPercent(trade) {
+      if (!trade.accountBalanceBefore || !trade.riskAmount) {
+        return 0;
+      }
+
+      return roundTo((trade.riskAmount / trade.accountBalanceBefore) * 100, 4);
+    }
+
+    function calculateRewardRiskRatio(trade) {
+      if (!trade.stopLossPrice || !trade.takeProfitPrice || !hasValidTradeNumbers(trade)) {
+        return 0;
+      }
+
+      const riskPerUnit = trade.type === "short"
+        ? trade.stopLossPrice - trade.entryPrice
+        : trade.entryPrice - trade.stopLossPrice;
+      const rewardPerUnit = trade.type === "short"
+        ? trade.entryPrice - trade.takeProfitPrice
+        : trade.takeProfitPrice - trade.entryPrice;
+
+      if (riskPerUnit <= 0 || rewardPerUnit <= 0) {
+        return 0;
+      }
+
+      return roundTo(rewardPerUnit / riskPerUnit, 2);
+    }
+
+    function addTradeResults(trade) {
+      const riskPercent = calculateRiskPercent(trade);
+
+      return {
+        ...trade,
+        profitLoss: calculateProfitLoss(trade),
+        profitLossPercent: calculateProfitLossPercent(trade),
+        riskPercent,
+        rewardRiskRatio: calculateRewardRiskRatio(trade),
+        isHighRisk: riskPercent > RISK_WARNING_PERCENT
+      };
+    }
+
+    function formatMoney(value, showSign = false) {
+      const numericValue = Number.isFinite(value) ? value : 0;
+      const prefix = showSign && numericValue > 0 ? "+" : "";
+
+      return prefix + new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 2
+      }).format(numericValue);
+    }
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat("en-US", {
+        maximumFractionDigits: 8
+      }).format(Number.isFinite(value) ? value : 0);
+    }
+
+    function formatPercent(value) {
+      const numericValue = Number.isFinite(value) ? value : 0;
+      const prefix = numericValue > 0 ? "+" : "";
+      return `${prefix}${numericValue.toFixed(2)}%`;
+    }
+
+    function formatWinRate(value) {
+      return `${(Number.isFinite(value) ? value : 0).toFixed(1)}%`;
+    }
+
+    function formatRiskPercent(value) {
+      return `${(Number.isFinite(value) ? value : 0).toFixed(2)}%`;
+    }
+
+    function formatRatio(value) {
+      if (value === Infinity) {
+        return "No Losses";
+      }
+
+      return (Number.isFinite(value) ? value : 0).toFixed(2);
+    }
+
+    function getResultClass(value) {
+      if (value > 0) {
+        return "profit";
+      }
+
+      if (value < 0) {
+        return "loss";
+      }
+
+      return "neutral";
+    }
+
+    function isValidScreenshotUrl(value) {
+      const trimmedValue = value.trim();
+
+      if (!trimmedValue) {
+        return true;
+      }
+
+      try {
+        const url = new URL(trimmedValue);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function validateScreenshotFile(file) {
+      if (!file) {
+        return "Choose an image file first.";
+      }
+
+      if (!ALLOWED_SCREENSHOT_TYPES.includes(file.type)) {
+        return "Screenshot must be a JPG, PNG, WebP, or GIF image.";
+      }
+
+      if (file.size > MAX_SCREENSHOT_SIZE_BYTES) {
+        return `Screenshot must be ${formatFileSize(MAX_SCREENSHOT_SIZE_BYTES)} or smaller.`;
+      }
+
+      return "";
+    }
+
+    function createScreenshotImage(file, dataUrl) {
+      return normalizeScreenshotImage({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        dataUrl
+      });
+    }
+
+    function tradeMatchesFilters(trade, filters) {
+      const searchTerm = filters.search.trim().toLowerCase();
+      const matchesSearch = !searchTerm || trade.symbol.toLowerCase().includes(searchTerm);
+      const matchesType = filters.tradeType === "all" || trade.type === filters.tradeType;
+      const matchesStartDate = !filters.startDate || trade.date >= filters.startDate;
+      const matchesEndDate = !filters.endDate || trade.date <= filters.endDate;
+      const matchesResult =
+        filters.result === "all" ||
+        (filters.result === "win" && trade.profitLoss > 0) ||
+        (filters.result === "loss" && trade.profitLoss < 0);
+
+      return matchesSearch && matchesType && matchesStartDate && matchesEndDate && matchesResult;
+    }
+
+    function calculateStats(trades) {
+      const totals = trades.reduce((current, trade) => {
+        const profitLoss = trade.profitLoss;
+        current.totalProfit += profitLoss;
+
+        if (profitLoss > 0) {
+          current.winningTrades += 1;
+          current.grossProfit += profitLoss;
+        }
+
+        if (profitLoss < 0) {
+          current.losingTrades += 1;
+          current.grossLoss += Math.abs(profitLoss);
+          current.lossTotal += profitLoss;
+        }
+
+        if (trade.type === "long") {
+          current.longTrades += 1;
+          current.longWins += profitLoss > 0 ? 1 : 0;
+        }
+
+        if (trade.type === "short") {
+          current.shortTrades += 1;
+          current.shortWins += profitLoss > 0 ? 1 : 0;
+        }
+
+        if (!current.bestTrade || profitLoss > current.bestTrade.profitLoss) {
+          current.bestTrade = trade;
+        }
+
+        if (!current.worstTrade || profitLoss < current.worstTrade.profitLoss) {
+          current.worstTrade = trade;
+        }
+
+        if (trade.riskPercent > 0) {
+          current.riskTradeCount += 1;
+          current.totalRiskPercent += trade.riskPercent;
+        }
+
+        if (trade.riskPercent > current.highestRiskPercent) {
+          current.highestRiskPercent = trade.riskPercent;
+          current.highestRiskTrade = trade;
+        }
+
+        if (trade.isHighRisk) {
+          current.highRiskTrades += 1;
+        }
+
+        return current;
+      }, {
+        totalProfit: 0,
+        winningTrades: 0,
+        losingTrades: 0,
+        grossProfit: 0,
+        grossLoss: 0,
+        lossTotal: 0,
+        longTrades: 0,
+        shortTrades: 0,
+        longWins: 0,
+        shortWins: 0,
+        bestTrade: null,
+        worstTrade: null,
+        riskTradeCount: 0,
+        totalRiskPercent: 0,
+        highestRiskPercent: 0,
+        highestRiskTrade: null,
+        highRiskTrades: 0
+      });
+
+      const totalTrades = trades.length;
+      const totalProfit = roundToCurrency(totals.totalProfit);
+      const grossProfit = roundToCurrency(totals.grossProfit);
+      const grossLoss = roundToCurrency(totals.grossLoss);
+      const winrate = totalTrades ? (totals.winningTrades / totalTrades) * 100 : 0;
+      const averageWin = totals.winningTrades ? roundToCurrency(grossProfit / totals.winningTrades) : 0;
+      const averageLoss = totals.losingTrades ? roundToCurrency(totals.lossTotal / totals.losingTrades) : 0;
+      const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? Infinity : 0;
+      const longWinRate = totals.longTrades ? (totals.longWins / totals.longTrades) * 100 : 0;
+      const shortWinRate = totals.shortTrades ? (totals.shortWins / totals.shortTrades) * 100 : 0;
+      const averageRiskPercent = totals.riskTradeCount
+        ? roundTo(totals.totalRiskPercent / totals.riskTradeCount, 4)
+        : 0;
+
+      return {
+        totalTrades,
+        totalProfit,
+        winrate,
+        winningTrades: totals.winningTrades,
+        losingTrades: totals.losingTrades,
+        averageWin,
+        averageLoss,
+        profitFactor,
+        bestTrade: totals.bestTrade,
+        worstTrade: totals.worstTrade,
+        longWinRate,
+        shortWinRate,
+        longTrades: totals.longTrades,
+        shortTrades: totals.shortTrades,
+        averageRiskPercent,
+        highestRiskTrade: totals.highestRiskTrade,
+        highRiskTrades: totals.highRiskTrades,
+        riskTradeCount: totals.riskTradeCount
+      };
+    }
+
+    function sortTradesByDate(trades) {
+      return trades
+        .map((trade, index) => ({ trade, index }))
+        .sort((first, second) => {
+          const dateSort = first.trade.date.localeCompare(second.trade.date);
+          return dateSort || first.index - second.index;
+        })
+        .map((item) => item.trade);
+    }
+
+    function buildEquityCurveData(trades) {
+      let cumulativeProfit = 0;
+
+      return sortTradesByDate(trades).reduce((chartData, trade) => {
+        cumulativeProfit = roundToCurrency(cumulativeProfit + trade.profitLoss);
+
+        chartData.labels.push(`${trade.date} ${trade.symbol}`);
+        chartData.values.push(cumulativeProfit);
+        chartData.tooltips.push({
+          symbol: trade.symbol,
+          date: trade.date,
+          profitLoss: trade.profitLoss,
+          cumulativeProfit
+        });
+
+        return chartData;
+      }, {
+        labels: [],
+        values: [],
+        tooltips: []
+      });
+    }
+
+    function buildDailyProfitLossData(trades) {
+      const dailyTotals = new Map();
+
+      sortTradesByDate(trades).forEach((trade) => {
+        dailyTotals.set(
+          trade.date,
+          roundToCurrency((dailyTotals.get(trade.date) || 0) + trade.profitLoss)
+        );
+      });
+
+      return {
+        labels: Array.from(dailyTotals.keys()),
+        values: Array.from(dailyTotals.values())
+      };
+    }
+
+    function buildChartSeries(trades) {
+      const equityCurve = buildEquityCurveData(trades);
+      const dailyProfitLoss = buildDailyProfitLossData(trades);
+      const totalGrowth = equityCurve.values.length
+        ? equityCurve.values[equityCurve.values.length - 1]
+        : 0;
+
+      return {
+        equityCurve,
+        dailyProfitLoss,
+        totalGrowth,
+        tradeCount: trades.length
+      };
+    }
+
+    function getExportFileName(extension) {
+      return `trading-journal-${getTodayDate()}.${extension}`;
+    }
+
+    function downloadFile(content, fileName, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeCsvValue(value) {
+      const text = String(value ?? "");
+
+      if (/[",\n\r]/.test(text)) {
+        return `"${text.replace(/"/g, '""')}"`;
+      }
+
+      return text;
+    }
+
+    function createCsvExport(trades) {
+      const headers = [
+        "Date",
+        "Symbol",
+        "Type",
+        "Entry Price",
+        "Exit Price",
+        "Position Size",
+        "Account Balance Before",
+        "Risk Amount",
+        "Stop Loss Price",
+        "Take Profit Price",
+        "Risk %",
+        "Reward/Risk Ratio",
+        "High Risk",
+        "Profit/Loss",
+        "Profit/Loss %",
+        "Emotion",
+        "Notes",
+        "Screenshot URL",
+        "Uploaded Screenshot",
+        "Screenshot File"
+      ];
+
+      const rows = trades.map((trade) => {
+        const tradeWithResults = addTradeResults(trade);
+
+        return [
+          tradeWithResults.date,
+          tradeWithResults.symbol,
+          tradeWithResults.type,
+          tradeWithResults.entryPrice,
+          tradeWithResults.exitPrice,
+          tradeWithResults.positionSize,
+          tradeWithResults.accountBalanceBefore || "",
+          tradeWithResults.riskAmount || "",
+          tradeWithResults.stopLossPrice || "",
+          tradeWithResults.takeProfitPrice || "",
+          tradeWithResults.riskPercent,
+          tradeWithResults.rewardRiskRatio,
+          tradeWithResults.isHighRisk ? "Yes" : "No",
+          tradeWithResults.profitLoss,
+          tradeWithResults.profitLossPercent,
+          tradeWithResults.emotion,
+          tradeWithResults.notes,
+          tradeWithResults.screenshotUrl,
+          tradeWithResults.screenshotImage ? "Yes" : "No",
+          tradeWithResults.screenshotImage?.name || ""
+        ];
+      });
+
+      return [headers, ...rows]
+        .map((row) => row.map(escapeCsvValue).join(","))
+        .join("\n");
+    }
+
+    function createJsonExport(trades) {
+      return JSON.stringify({
+        app: "trading-journal",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        trades
+      }, null, 2);
+    }
+
+    function getTradesFromJsonBackup(data) {
+      if (Array.isArray(data)) {
+        return data;
+      }
+
+      if (data && typeof data === "object" && Array.isArray(data.trades)) {
+        return data.trades;
+      }
+
+      return null;
+    }
+
+    function validateImportedTrades(data) {
+      const importedTrades = getTradesFromJsonBackup(data);
+
+      if (!importedTrades) {
+        return {
+          error: "JSON must be an array of trades or an object with a trades array."
+        };
+      }
+
+      const normalizedTrades = ensureUniqueTradeIds(importedTrades.map(normalizeTrade).filter(Boolean));
+      const skippedTrades = importedTrades.length - normalizedTrades.length;
+
+      if (importedTrades.length > 0 && normalizedTrades.length === 0) {
+        return {
+          error: "No valid trades were found in that JSON file."
+        };
+      }
+
+      return {
+        trades: normalizedTrades,
+        skippedTrades
+      };
+    }
+
+    function createTradeId() {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+      }
+
+      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function SummaryCard({ label, value, detail, chip, accent = "primary", valueClass = "" }) {
+      return (
+        <article className={`stat-card stat-${accent}`}>
+          <div className="stat-header">
+            <div className="stat-label">{label}</div>
+            <div className="stat-chip">{chip}</div>
+          </div>
+          <div className={`stat-value ${valueClass}`}>{value}</div>
+          <div className="stat-detail">{detail}</div>
+        </article>
+      );
+    }
+
+    function App() {
+      const importInputRef = useRef(null);
+      const screenshotInputRef = useRef(null);
+      const equityCanvasRef = useRef(null);
+      const dailyCanvasRef = useRef(null);
+      const equityChartRef = useRef(null);
+      const dailyChartRef = useRef(null);
+      const [session, setSession] = useState(null);
+      const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+      const [isLoadingTrades, setIsLoadingTrades] = useState(false);
+      const [isSaving, setIsSaving] = useState(false);
+      const [authMode, setAuthMode] = useState("login");
+      const [authForm, setAuthForm] = useState({ email: "", password: "" });
+      const [authMessage, setAuthMessage] = useState({
+        type: getSupabaseSetupError() ? "error" : "",
+        text: getSupabaseSetupError()
+      });
+      const [trades, setTrades] = useState([]);
+      const [form, setForm] = useState(getDefaultForm);
+      const [filters, setFilters] = useState(DEFAULT_FILTERS);
+      const [editingId, setEditingId] = useState(null);
+      const [error, setError] = useState("");
+      const [backupMessage, setBackupMessage] = useState({ type: "", text: "" });
+      const [previewImage, setPreviewImage] = useState(null);
+
+      useEffect(() => {
+        const setupError = getSupabaseSetupError();
+
+        if (setupError || !supabaseClient) {
+          setAuthMessage({ type: "error", text: setupError });
+          setIsCheckingAuth(false);
+          return;
+        }
+
+        let isMounted = true;
+
+        supabaseClient.auth.getSession().then(({ data, error }) => {
+          if (!isMounted) {
+            return;
+          }
+
+          if (error) {
+            setAuthMessage({ type: "error", text: error.message });
+          }
+
+          setSession(data.session);
+          setIsCheckingAuth(false);
+        });
+
+        const { data: authListener } = supabaseClient.auth.onAuthStateChange((_event, nextSession) => {
+          setSession(nextSession);
+
+          if (!nextSession) {
+            setTrades([]);
+            setEditingId(null);
+            setForm(getDefaultForm());
+          }
+        });
+
+        return () => {
+          isMounted = false;
+          authListener.subscription.unsubscribe();
+        };
+      }, []);
+
+      useEffect(() => {
+        if (!session?.user?.id || !supabaseClient) {
+          setTrades([]);
+          setIsLoadingTrades(false);
+          return;
+        }
+
+        fetchTrades();
+      }, [session?.user?.id]);
+
+      const tradesWithResults = useMemo(() => {
+        return trades.map(addTradeResults);
+      }, [trades]);
+
+      const filteredTradesWithResults = useMemo(() => {
+        return tradesWithResults.filter((trade) => tradeMatchesFilters(trade, filters));
+      }, [filters, tradesWithResults]);
+
+      const metrics = useMemo(() => {
+        return calculateStats(filteredTradesWithResults);
+      }, [filteredTradesWithResults]);
+
+      const chartData = useMemo(() => {
+        return buildChartSeries(filteredTradesWithResults);
+      }, [filteredTradesWithResults]);
+
+      useEffect(() => {
+        const ChartLibrary = window.Chart;
+
+        if (!ChartLibrary || !equityCanvasRef.current || !dailyCanvasRef.current) {
+          return;
+        }
+
+        const gridColor = "rgba(100, 113, 128, 0.16)";
+        const labelColor = "#647180";
+
+        equityChartRef.current = new ChartLibrary(equityCanvasRef.current, {
+          type: "line",
+          data: {
+            labels: chartData.equityCurve.labels,
+            datasets: [{
+              label: "Cumulative P/L",
+              data: chartData.equityCurve.values,
+              borderColor: "#147d8f",
+              backgroundColor: "rgba(20, 125, 143, 0.12)",
+              borderWidth: 3,
+              fill: true,
+              pointBackgroundColor: "#147d8f",
+              pointBorderColor: "#ffffff",
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              tension: 0.28
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              intersect: false,
+              mode: "index"
+            },
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label(context) {
+                    const point = chartData.equityCurve.tooltips[context.dataIndex];
+
+                    if (!point) {
+                      return `Equity: ${formatMoney(context.parsed.y, true)}`;
+                    }
+
+                    return [
+                      `${point.symbol} on ${point.date}`,
+                      `Trade P/L: ${formatMoney(point.profitLoss, true)}`,
+                      `Equity: ${formatMoney(point.cumulativeProfit, true)}`
+                    ];
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: {
+                  color: labelColor,
+                  maxRotation: 0,
+                  autoSkip: true
+                },
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                ticks: {
+                  color: labelColor,
+                  callback(value) {
+                    return formatMoney(Number(value));
+                  }
+                },
+                grid: {
+                  color: gridColor
+                }
+              }
+            }
+          }
+        });
+
+        dailyChartRef.current = new ChartLibrary(dailyCanvasRef.current, {
+          type: "bar",
+          data: {
+            labels: chartData.dailyProfitLoss.labels,
+            datasets: [{
+              label: "Daily P/L",
+              data: chartData.dailyProfitLoss.values,
+              backgroundColor: chartData.dailyProfitLoss.values.map((value) =>
+                value >= 0 ? "rgba(16, 128, 91, 0.78)" : "rgba(196, 64, 64, 0.78)"
+              ),
+              borderColor: chartData.dailyProfitLoss.values.map((value) =>
+                value >= 0 ? "#10805b" : "#c44040"
+              ),
+              borderWidth: 1,
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label(context) {
+                    return `Daily P/L: ${formatMoney(context.parsed.y, true)}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: {
+                  color: labelColor,
+                  maxRotation: 0,
+                  autoSkip: true
+                },
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                ticks: {
+                  color: labelColor,
+                  callback(value) {
+                    return formatMoney(Number(value));
+                  }
+                },
+                grid: {
+                  color: gridColor
+                }
+              }
+            }
+          }
+        });
+
+        return () => {
+          equityChartRef.current?.destroy();
+          dailyChartRef.current?.destroy();
+          equityChartRef.current = null;
+          dailyChartRef.current = null;
+        };
+      }, [chartData]);
+
+      async function fetchTrades() {
+        if (!session?.user?.id || !supabaseClient) {
+          return;
+        }
+
+        setIsLoadingTrades(true);
+        setError("");
+
+        try {
+          const { data, error } = await supabaseClient
+            .from(TRADES_TABLE)
+            .select("*")
+            .eq("user_id", session.user.id)
+            .order("trade_date", { ascending: false })
+            .order("created_at", { ascending: false });
+
+          if (error) {
+            setError(`Could not load trades: ${error.message}`);
+            setTrades([]);
+            return;
+          }
+
+          setTrades((data || []).map(fromTradeRow).filter(Boolean));
+        } catch (error) {
+          setError("Could not connect to Supabase. Check your project settings and internet connection.");
+          setTrades([]);
+        } finally {
+          setIsLoadingTrades(false);
+        }
+      }
+
+      function updateAuthField(event) {
+        const { name, value } = event.target;
+        setAuthForm((current) => ({ ...current, [name]: value }));
+      }
+
+      function switchAuthMode(mode) {
+        setAuthMode(mode);
+        setAuthMessage({ type: "", text: "" });
+      }
+
+      async function handleAuthSubmit(event) {
+        event.preventDefault();
+
+        if (!supabaseClient) {
+          setAuthMessage({ type: "error", text: getSupabaseSetupError() });
+          return;
+        }
+
+        const email = authForm.email.trim();
+        const password = authForm.password;
+
+        if (!email || !password) {
+          setAuthMessage({ type: "error", text: "Email and password are required." });
+          return;
+        }
+
+        if (password.length < 6) {
+          setAuthMessage({ type: "error", text: "Password must be at least 6 characters." });
+          return;
+        }
+
+        setIsSaving(true);
+        setAuthMessage({ type: "", text: "" });
+
+        try {
+          const authRequest = authMode === "register"
+            ? supabaseClient.auth.signUp({ email, password })
+            : supabaseClient.auth.signInWithPassword({ email, password });
+          const { data, error } = await authRequest;
+
+          if (error) {
+            setAuthMessage({ type: "error", text: error.message });
+            return;
+          }
+
+          if (authMode === "register" && !data.session) {
+            setAuthMessage({
+              type: "success",
+              text: "Account created. Check your email to confirm your account, then log in."
+            });
+            return;
+          }
+
+          setAuthMessage({ type: "success", text: "Signed in successfully." });
+          setAuthForm({ email: "", password: "" });
+        } catch (error) {
+          setAuthMessage({ type: "error", text: "Authentication failed. Please try again." });
+        } finally {
+          setIsSaving(false);
+        }
+      }
+
+      async function logout() {
+        if (!supabaseClient) {
+          return;
+        }
+
+        setIsSaving(true);
+        const { error } = await supabaseClient.auth.signOut();
+        setIsSaving(false);
+
+        if (error) {
+          setAuthMessage({ type: "error", text: error.message });
+          return;
+        }
+
+        setAuthMode("login");
+        setAuthForm({ email: "", password: "" });
+        setAuthMessage({ type: "success", text: "Logged out." });
+        setBackupMessage({ type: "", text: "" });
+        setPreviewImage(null);
+      }
+
+      function updateField(event) {
+        const { name, value } = event.target;
+        setForm((current) => ({ ...current, [name]: value }));
+      }
+
+      function updateFilter(event) {
+        const { name, value } = event.target;
+        setFilters((current) => ({ ...current, [name]: value }));
+      }
+
+      function resetFilters() {
+        setFilters(DEFAULT_FILTERS);
+      }
+
+      function openScreenshotPicker() {
+        screenshotInputRef.current?.click();
+      }
+
+      function removeScreenshotImage() {
+        setForm((current) => ({ ...current, screenshotImage: null }));
+
+        if (screenshotInputRef.current) {
+          screenshotInputRef.current.value = "";
+        }
+      }
+
+      function handleScreenshotUpload(event) {
+        const file = event.target.files?.[0];
+
+        if (!file) {
+          return;
+        }
+
+        const validationMessage = validateScreenshotFile(file);
+
+        if (validationMessage) {
+          setError(validationMessage);
+          event.target.value = "";
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onerror = () => {
+          setError("Could not read that screenshot image.");
+          event.target.value = "";
+        };
+
+        reader.onload = () => {
+          const screenshotImage = createScreenshotImage(file, String(reader.result || ""));
+
+          if (!screenshotImage) {
+            setError("Screenshot image is invalid or too large.");
+            event.target.value = "";
+            return;
+          }
+
+          setForm((current) => ({ ...current, screenshotImage }));
+          setError("");
+          event.target.value = "";
+        };
+
+        reader.readAsDataURL(file);
+      }
+
+      function showBackupMessage(text, type = "success") {
+        setBackupMessage({ text, type });
+      }
+
+      function exportTradesAsCsv() {
+        if (trades.length === 0) {
+          showBackupMessage("Add at least one trade before exporting.", "error");
+          return;
+        }
+
+        downloadFile(
+          createCsvExport(trades),
+          getExportFileName("csv"),
+          "text/csv;charset=utf-8"
+        );
+        showBackupMessage(`Exported ${trades.length} trades to CSV.`);
+      }
+
+      function exportTradesAsJson() {
+        if (trades.length === 0) {
+          showBackupMessage("Add at least one trade before exporting.", "error");
+          return;
+        }
+
+        downloadFile(
+          createJsonExport(trades),
+          getExportFileName("json"),
+          "application/json;charset=utf-8"
+        );
+        showBackupMessage(`Exported ${trades.length} trades to JSON.`);
+      }
+
+      function openImportPicker() {
+        importInputRef.current?.click();
+      }
+
+      function importTradesFromJson(event) {
+        const file = event.target.files?.[0];
+
+        if (!file) {
+          return;
+        }
+
+        if (!session?.user?.id || !supabaseClient) {
+          showBackupMessage("Log in before importing trades.", "error");
+          event.target.value = "";
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onerror = () => {
+          showBackupMessage("Could not read that JSON file.", "error");
+        };
+
+        reader.onload = async () => {
+          try {
+            const parsedBackup = JSON.parse(String(reader.result || ""));
+            const validation = validateImportedTrades(parsedBackup);
+
+            if (validation.error) {
+              showBackupMessage(validation.error, "error");
+              return;
+            }
+
+            const skippedText = validation.skippedTrades
+              ? ` ${validation.skippedTrades} invalid ${validation.skippedTrades === 1 ? "trade was" : "trades were"} skipped.`
+              : "";
+            const confirmed = window.confirm(
+              `Import ${validation.trades.length} trades from ${file.name}? This will replace your current ${trades.length} trades.${skippedText}`
+            );
+
+            if (!confirmed) {
+              showBackupMessage("Import canceled.");
+              return;
+            }
+
+            const rowsToInsert = validation.trades
+              .map((trade) => toTradeRow(trade, session.user.id))
+              .filter(Boolean);
+
+            if (rowsToInsert.length !== validation.trades.length) {
+              showBackupMessage("Some trades could not be prepared for Supabase import.", "error");
+              return;
+            }
+
+            setIsSaving(true);
+
+            if (rowsToInsert.length === 0) {
+              const { error: deleteError } = await supabaseClient
+                .from(TRADES_TABLE)
+                .delete()
+                .eq("user_id", session.user.id);
+
+              if (deleteError) {
+                showBackupMessage(`Import failed while clearing trades: ${deleteError.message}`, "error");
+                return;
+              }
+
+              setTrades([]);
+              resetForm();
+              resetFilters();
+              showBackupMessage("Imported an empty JSON backup. Your Supabase journal is now empty.");
+              return;
+            }
+
+            const { data, error } = await supabaseClient
+              .from(TRADES_TABLE)
+              .insert(rowsToInsert)
+              .select();
+
+            if (error) {
+              showBackupMessage(`Import failed: ${error.message}`, "error");
+              return;
+            }
+
+            const previousTradeIds = trades.map((trade) => trade.id).filter(Boolean);
+
+            if (previousTradeIds.length > 0) {
+              const { error: deleteError } = await supabaseClient
+                .from(TRADES_TABLE)
+                .delete()
+                .in("id", previousTradeIds);
+
+              if (deleteError) {
+                await fetchTrades();
+                showBackupMessage(
+                  `Imported ${validation.trades.length} trades, but old trades could not be removed: ${deleteError.message}`,
+                  "error"
+                );
+                return;
+              }
+            }
+
+            setTrades((data || []).map(fromTradeRow).filter(Boolean));
+            resetForm();
+            resetFilters();
+            showBackupMessage(`Imported ${validation.trades.length} trades from JSON.${skippedText}`);
+          } catch (error) {
+            const message = error instanceof SyntaxError
+              ? "That file is not valid JSON. Your journal was not changed."
+              : "Import failed. Your journal was not changed.";
+            showBackupMessage(message, "error");
+          } finally {
+            setIsSaving(false);
+          }
+        };
+
+        reader.readAsText(file);
+        event.target.value = "";
+      }
+
+      function validateForm() {
+        if (!form.symbol.trim()) {
+          return "Pair or symbol is required.";
+        }
+
+        if (!form.date) {
+          return "Date is required.";
+        }
+
+        const entry = parseTradeNumber(form.entryPrice);
+        const exit = parseTradeNumber(form.exitPrice);
+        const size = parseTradeNumber(form.positionSize);
+        const optionalRiskFields = [
+          ["Account balance before trade", form.accountBalanceBefore],
+          ["Risk amount", form.riskAmount],
+          ["Stop loss price", form.stopLossPrice],
+          ["Take profit price", form.takeProfitPrice]
+        ];
+
+        if (!Number.isFinite(entry) || entry <= 0) {
+          return "Entry price must be greater than 0.";
+        }
+
+        if (!Number.isFinite(exit) || exit <= 0) {
+          return "Exit price must be greater than 0.";
+        }
+
+        if (!Number.isFinite(size) || size <= 0) {
+          return "Position size must be greater than 0.";
+        }
+
+        for (const [label, value] of optionalRiskFields) {
+          if (value !== "" && parseOptionalTradeNumber(value) === null) {
+            return `${label} must be greater than 0 when provided.`;
+          }
+        }
+
+        if (!isValidScreenshotUrl(form.screenshotUrl)) {
+          return "Screenshot URL must start with http:// or https://.";
+        }
+
+        return "";
+      }
+
+      async function handleSubmit(event) {
+        event.preventDefault();
+
+        const validationMessage = validateForm();
+        if (validationMessage) {
+          setError(validationMessage);
+          return;
+        }
+
+        if (!session?.user?.id || !supabaseClient) {
+          setError("Log in before saving trades.");
+          return;
+        }
+
+        const tradeData = normalizeTrade({
+          ...form,
+          id: editingId || createTradeId(),
+          symbol: form.symbol.trim().toUpperCase(),
+          entryPrice: parseTradeNumber(form.entryPrice),
+          exitPrice: parseTradeNumber(form.exitPrice),
+          positionSize: parseTradeNumber(form.positionSize),
+          accountBalanceBefore: parseOptionalTradeNumber(form.accountBalanceBefore),
+          riskAmount: parseOptionalTradeNumber(form.riskAmount),
+          stopLossPrice: parseOptionalTradeNumber(form.stopLossPrice),
+          takeProfitPrice: parseOptionalTradeNumber(form.takeProfitPrice),
+          emotion: form.emotion.trim(),
+          notes: form.notes.trim(),
+          screenshotUrl: form.screenshotUrl.trim(),
+          screenshotImage: form.screenshotImage
+        });
+
+        if (!tradeData) {
+          setError("Trade data is invalid. Check the symbol, prices, and size.");
+          return;
+        }
+
+        const rowData = toTradeRow(tradeData, session.user.id);
+
+        if (!rowData) {
+          setError("Trade data is invalid. Check the symbol, prices, and size.");
+          return;
+        }
+
+        setIsSaving(true);
+        setError("");
+
+        try {
+          if (editingId) {
+            const { data, error } = await supabaseClient
+              .from(TRADES_TABLE)
+              .update(rowData)
+              .eq("id", editingId)
+              .select()
+              .single();
+
+            if (error) {
+              setError(`Could not update trade: ${error.message}`);
+              return;
+            }
+
+            const savedTrade = fromTradeRow(data);
+            if (!savedTrade) {
+              setError("Supabase returned invalid trade data.");
+              return;
+            }
+
+            setTrades((current) =>
+              current.map((trade) => (trade.id === editingId ? savedTrade : trade))
+            );
+          } else {
+            const { data, error } = await supabaseClient
+              .from(TRADES_TABLE)
+              .insert(rowData)
+              .select()
+              .single();
+
+            if (error) {
+              setError(`Could not save trade: ${error.message}`);
+              return;
+            }
+
+            const savedTrade = fromTradeRow(data);
+            if (!savedTrade) {
+              setError("Supabase returned invalid trade data.");
+              return;
+            }
+
+            setTrades((current) => [savedTrade, ...current]);
+          }
+
+          resetForm();
+        } catch (error) {
+          setError("Could not save trade. Check your Supabase connection and table setup.");
+        } finally {
+          setIsSaving(false);
+        }
+      }
+
+      function resetForm() {
+        setForm(getDefaultForm());
+        setEditingId(null);
+        setError("");
+
+        if (screenshotInputRef.current) {
+          screenshotInputRef.current.value = "";
+        }
+      }
+
+      function editTrade(trade) {
+        setForm({
+          symbol: trade.symbol,
+          type: trade.type,
+          entryPrice: trade.entryPrice,
+          exitPrice: trade.exitPrice,
+          positionSize: trade.positionSize,
+          accountBalanceBefore: trade.accountBalanceBefore || "",
+          riskAmount: trade.riskAmount || "",
+          stopLossPrice: trade.stopLossPrice || "",
+          takeProfitPrice: trade.takeProfitPrice || "",
+          date: trade.date,
+          emotion: trade.emotion || "",
+          notes: trade.notes || "",
+          screenshotUrl: trade.screenshotUrl || "",
+          screenshotImage: trade.screenshotImage || null
+        });
+        setEditingId(trade.id);
+        setError("");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      async function deleteTrade(id) {
+        const trade = trades.find((item) => item.id === id);
+        const confirmed = window.confirm(`Delete ${trade?.symbol || "this trade"}?`);
+
+        if (!confirmed) {
+          return;
+        }
+
+        if (!supabaseClient) {
+          setError("Supabase is not configured.");
+          return;
+        }
+
+        setIsSaving(true);
+        setError("");
+
+        try {
+          const { error } = await supabaseClient
+            .from(TRADES_TABLE)
+            .delete()
+            .eq("id", id);
+
+          if (error) {
+            setError(`Could not delete trade: ${error.message}`);
+            return;
+          }
+
+          setTrades((current) => current.filter((item) => item.id !== id));
+          if (editingId === id) {
+            resetForm();
+          }
+        } catch (error) {
+          setError("Could not delete trade. Check your Supabase connection.");
+        } finally {
+          setIsSaving(false);
+        }
+      }
+
+      const hasActiveFilters =
+        filters.search.trim() ||
+        filters.result !== "all" ||
+        filters.tradeType !== "all" ||
+        filters.startDate ||
+        filters.endDate;
+
+      const setupError = getSupabaseSetupError();
+      const currentUserEmail = session?.user?.email || "Signed in";
+
+      if (isCheckingAuth || !session) {
+        const showAuthForm = !isCheckingAuth && !setupError;
+
+        return (
+          <main className="auth-shell">
+            <section className="auth-card">
+              <div className="auth-card-header">
+                <p className="eyebrow">Trading Journal</p>
+                <h1>{authMode === "register" ? "Create Account" : "Sign In"}</h1>
+                <p className="subtitle">
+                  Save your journal securely in Supabase and sync it after login.
+                </p>
+              </div>
+
+              <form className="auth-form" onSubmit={handleAuthSubmit}>
+                {isCheckingAuth && (
+                  <div className="loading-state">Checking your session...</div>
+                )}
+
+                {!isCheckingAuth && setupError && (
+                  <div className="error-box">{setupError}</div>
+                )}
+
+                {authMessage.text && !setupError && (
+                  <div className={`status-box status-${authMessage.type || "success"}`}>
+                    {authMessage.text}
+                  </div>
+                )}
+
+                {showAuthForm && (
+                  <React.Fragment>
+                    <div className="field">
+                      <label htmlFor="authEmail">Email</label>
+                      <input
+                        id="authEmail"
+                        name="email"
+                        type="email"
+                        value={authForm.email}
+                        onChange={updateAuthField}
+                        placeholder="you@example.com"
+                        autoComplete="email"
+                      />
+                    </div>
+
+                    <div className="field">
+                      <label htmlFor="authPassword">Password</label>
+                      <input
+                        id="authPassword"
+                        name="password"
+                        type="password"
+                        value={authForm.password}
+                        onChange={updateAuthField}
+                        placeholder="Minimum 6 characters"
+                        autoComplete={authMode === "register" ? "new-password" : "current-password"}
+                      />
+                    </div>
+
+                    <button className="btn btn-primary" type="submit" disabled={isSaving}>
+                      {isSaving
+                        ? "Please wait..."
+                        : authMode === "register"
+                          ? "Create Account"
+                          : "Sign In"}
+                    </button>
+
+                    <div className="auth-switch">
+                      {authMode === "register" ? "Already have an account? " : "New here? "}
+                      <button
+                        type="button"
+                        onClick={() => switchAuthMode(authMode === "register" ? "login" : "register")}
+                      >
+                        {authMode === "register" ? "Sign in" : "Create account"}
+                      </button>
+                    </div>
+                  </React.Fragment>
+                )}
+              </form>
+            </section>
+          </main>
+        );
+      }
+
+      return (
+        <main className="app-shell">
+          <header className="topbar">
+            <div>
+              <p className="eyebrow">Trading Journal</p>
+              <h1>Performance Dashboard</h1>
+              <p className="subtitle">
+                Review trade results, risk notes, and execution quality in one focused view.
+              </p>
+            </div>
+            <div className="user-actions">
+              <div className="user-pill" title={currentUserEmail}>
+                <span className="storage-dot"></span>
+                {currentUserEmail}
+              </div>
+              <button className="btn btn-secondary btn-small" type="button" onClick={logout} disabled={isSaving}>
+                Logout
+              </button>
+            </div>
+          </header>
+
+          {isLoadingTrades && (
+            <section className="panel loading-state" aria-live="polite">
+              Loading your Supabase trades...
+            </section>
+          )}
+
+          <section className="stats-grid" aria-label="Trading performance summary">
+            <SummaryCard
+              label="Total Trades"
+              value={metrics.totalTrades}
+              detail={`${metrics.winningTrades} winning ${metrics.winningTrades === 1 ? "trade" : "trades"}`}
+              chip="Count"
+              accent="primary"
+            />
+            <SummaryCard
+              label="Win Rate"
+              value={formatWinRate(metrics.winrate)}
+              detail={metrics.totalTrades ? "Closed trade accuracy" : "No trades logged"}
+              chip="Ratio"
+              accent="amber"
+            />
+            <SummaryCard
+              label="Total P/L"
+              value={formatMoney(metrics.totalProfit, true)}
+              detail="Net realized result"
+              chip="Net"
+              accent={metrics.totalProfit < 0 ? "red" : "green"}
+              valueClass={getResultClass(metrics.totalProfit)}
+            />
+            <SummaryCard
+              label="Best Trade"
+              value={formatMoney(metrics.bestTrade?.profitLoss || 0, true)}
+              detail={metrics.bestTrade ? `${metrics.bestTrade.symbol} on ${metrics.bestTrade.date}` : "No trades logged"}
+              chip="Max"
+              accent={metrics.bestTrade ? (metrics.bestTrade.profitLoss < 0 ? "red" : "green") : "primary"}
+              valueClass={getResultClass(metrics.bestTrade?.profitLoss || 0)}
+            />
+          </section>
+
+          <section className="panel advanced-panel" aria-label="Advanced trading statistics">
+            <div className="panel-header">
+              <h2>Advanced Statistics</h2>
+              <span className="panel-meta">Based on current filters</span>
+            </div>
+            <div className="advanced-stats-grid">
+              <SummaryCard
+                label="Average Win"
+                value={formatMoney(metrics.averageWin, true)}
+                detail={`${metrics.winningTrades} winning ${metrics.winningTrades === 1 ? "trade" : "trades"}`}
+                chip="Avg"
+                accent="green"
+                valueClass={getResultClass(metrics.averageWin)}
+              />
+              <SummaryCard
+                label="Average Loss"
+                value={formatMoney(metrics.averageLoss, true)}
+                detail={`${metrics.losingTrades} losing ${metrics.losingTrades === 1 ? "trade" : "trades"}`}
+                chip="Avg"
+                accent={metrics.losingTrades ? "red" : "primary"}
+                valueClass={getResultClass(metrics.averageLoss)}
+              />
+              <SummaryCard
+                label="Profit Factor"
+                value={formatRatio(metrics.profitFactor)}
+                detail="Gross profit / gross loss"
+                chip="PF"
+                accent={metrics.totalTrades ? (metrics.profitFactor >= 1 || metrics.profitFactor === Infinity ? "green" : "red") : "primary"}
+                valueClass={metrics.totalTrades ? (metrics.profitFactor >= 1 || metrics.profitFactor === Infinity ? "profit" : "loss") : "neutral"}
+              />
+              <SummaryCard
+                label="Best Trade"
+                value={formatMoney(metrics.bestTrade?.profitLoss || 0, true)}
+                detail={metrics.bestTrade ? `${metrics.bestTrade.symbol} on ${metrics.bestTrade.date}` : "No trades logged"}
+                chip="Max"
+                accent={metrics.bestTrade ? (metrics.bestTrade.profitLoss < 0 ? "red" : "green") : "primary"}
+                valueClass={getResultClass(metrics.bestTrade?.profitLoss || 0)}
+              />
+              <SummaryCard
+                label="Worst Trade"
+                value={formatMoney(metrics.worstTrade?.profitLoss || 0, true)}
+                detail={metrics.worstTrade ? `${metrics.worstTrade.symbol} on ${metrics.worstTrade.date}` : "No trades logged"}
+                chip="Min"
+                accent={metrics.worstTrade ? (metrics.worstTrade.profitLoss < 0 ? "red" : "green") : "primary"}
+                valueClass={getResultClass(metrics.worstTrade?.profitLoss || 0)}
+              />
+              <SummaryCard
+                label="Total Wins"
+                value={metrics.winningTrades}
+                detail="Trades with P/L above zero"
+                chip="Wins"
+                accent="green"
+              />
+              <SummaryCard
+                label="Total Losses"
+                value={metrics.losingTrades}
+                detail="Trades with P/L below zero"
+                chip="Losses"
+                accent={metrics.losingTrades ? "red" : "primary"}
+              />
+              <SummaryCard
+                label="Long Win Rate"
+                value={formatWinRate(metrics.longWinRate)}
+                detail={`${metrics.longTrades} long ${metrics.longTrades === 1 ? "trade" : "trades"}`}
+                chip="Long"
+                accent="green"
+              />
+              <SummaryCard
+                label="Short Win Rate"
+                value={formatWinRate(metrics.shortWinRate)}
+                detail={`${metrics.shortTrades} short ${metrics.shortTrades === 1 ? "trade" : "trades"}`}
+                chip="Short"
+                accent="red"
+              />
+            </div>
+          </section>
+
+          <section className="panel advanced-panel" aria-label="Risk management statistics">
+            <div className="panel-header">
+              <h2>Risk Management</h2>
+              <span className="panel-meta">Warning above {formatRiskPercent(RISK_WARNING_PERCENT)}</span>
+            </div>
+            <div className="advanced-stats-grid">
+              <SummaryCard
+                label="Average Risk"
+                value={formatRiskPercent(metrics.averageRiskPercent)}
+                detail={`${metrics.riskTradeCount} risk-tracked ${metrics.riskTradeCount === 1 ? "trade" : "trades"}`}
+                chip="Risk"
+                accent={metrics.averageRiskPercent > RISK_WARNING_PERCENT ? "red" : "green"}
+                valueClass={metrics.averageRiskPercent > RISK_WARNING_PERCENT ? "loss" : "profit"}
+              />
+              <SummaryCard
+                label="Highest Risk"
+                value={formatRiskPercent(metrics.highestRiskTrade?.riskPercent || 0)}
+                detail={metrics.highestRiskTrade ? `${metrics.highestRiskTrade.symbol} on ${metrics.highestRiskTrade.date}` : "No risk data yet"}
+                chip="Max"
+                accent={metrics.highestRiskTrade?.riskPercent > RISK_WARNING_PERCENT ? "red" : "green"}
+                valueClass={metrics.highestRiskTrade?.riskPercent > RISK_WARNING_PERCENT ? "loss" : "profit"}
+              />
+              <SummaryCard
+                label="Above 2% Risk"
+                value={metrics.highRiskTrades}
+                detail="Trades over the risk warning level"
+                chip="Warn"
+                accent={metrics.highRiskTrades ? "red" : "primary"}
+                valueClass={metrics.highRiskTrades ? "loss" : "neutral"}
+              />
+            </div>
+          </section>
+
+          <section className="panel chart-panel" aria-label="Equity and daily profit charts">
+            <div className="panel-header">
+              <h2>Equity Curve</h2>
+              <span className="panel-meta chart-summary">
+                <span>{chartData.tradeCount} charted {chartData.tradeCount === 1 ? "trade" : "trades"}</span>
+                <strong className={getResultClass(chartData.totalGrowth)}>
+                  Growth {formatMoney(chartData.totalGrowth, true)}
+                </strong>
+              </span>
+            </div>
+            <div className="charts-grid">
+              <article className="chart-card">
+                <h3>Cumulative P/L</h3>
+                <div className="chart-canvas-wrap">
+                  {chartData.tradeCount === 0 && (
+                    <div className="chart-empty">Add trades or adjust filters to build the equity curve.</div>
+                  )}
+                  <canvas ref={equityCanvasRef} aria-label="Cumulative profit and loss chart"></canvas>
+                </div>
+              </article>
+              <article className="chart-card">
+                <h3>Daily P/L</h3>
+                <div className="chart-canvas-wrap">
+                  {chartData.tradeCount === 0 && (
+                    <div className="chart-empty">Daily P/L appears after matching trades are available.</div>
+                  )}
+                  <canvas ref={dailyCanvasRef} aria-label="Daily profit and loss chart"></canvas>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section className="panel backup-panel" aria-label="Journal backup tools">
+            <div className="panel-header">
+              <h2>Backup & Restore</h2>
+              <span className="panel-meta">{trades.length} Supabase {trades.length === 1 ? "trade" : "trades"}</span>
+            </div>
+            <div className="backup-actions">
+              <button
+                className="btn btn-secondary"
+                type="button"
+                onClick={exportTradesAsCsv}
+                disabled={trades.length === 0}
+              >
+                Export CSV
+              </button>
+              <button
+                className="btn btn-secondary"
+                type="button"
+                onClick={exportTradesAsJson}
+                disabled={trades.length === 0}
+              >
+                Export JSON
+              </button>
+              <button className="btn btn-primary" type="button" onClick={openImportPicker} disabled={isSaving}>
+                Import JSON
+              </button>
+              <input
+                ref={importInputRef}
+                className="hidden-file-input"
+                type="file"
+                accept=".json,application/json"
+                onChange={importTradesFromJson}
+              />
+            </div>
+            {backupMessage.text && (
+              <div className={`status-box status-${backupMessage.type}`}>
+                {backupMessage.text}
+              </div>
+            )}
+          </section>
+
+          <section className="panel filters-panel" aria-label="Trade filters">
+            <div className="panel-header">
+              <h2>Filters</h2>
+              <span className="panel-meta">
+                Showing {filteredTradesWithResults.length} of {tradesWithResults.length}
+              </span>
+            </div>
+            <div className="filters-grid">
+              <div className="field">
+                <label htmlFor="filterSearch">Search Symbol</label>
+                <input
+                  id="filterSearch"
+                  name="search"
+                  value={filters.search}
+                  onChange={updateFilter}
+                  placeholder="BTC, ETH, SOL"
+                />
+              </div>
+
+              <div className="field">
+                <label htmlFor="filterResult">Win / Loss</label>
+                <select
+                  id="filterResult"
+                  name="result"
+                  value={filters.result}
+                  onChange={updateFilter}
+                >
+                  <option value="all">All Results</option>
+                  <option value="win">Wins</option>
+                  <option value="loss">Losses</option>
+                </select>
+              </div>
+
+              <div className="field">
+                <label htmlFor="filterType">Long / Short</label>
+                <select
+                  id="filterType"
+                  name="tradeType"
+                  value={filters.tradeType}
+                  onChange={updateFilter}
+                >
+                  <option value="all">All Types</option>
+                  <option value="long">Long</option>
+                  <option value="short">Short</option>
+                </select>
+              </div>
+
+              <div className="field">
+                <label htmlFor="filterStartDate">From Date</label>
+                <input
+                  id="filterStartDate"
+                  name="startDate"
+                  type="date"
+                  value={filters.startDate}
+                  max={filters.endDate || undefined}
+                  onChange={updateFilter}
+                />
+              </div>
+
+              <div className="field">
+                <label htmlFor="filterEndDate">To Date</label>
+                <input
+                  id="filterEndDate"
+                  name="endDate"
+                  type="date"
+                  value={filters.endDate}
+                  min={filters.startDate || undefined}
+                  onChange={updateFilter}
+                />
+              </div>
+
+              <button
+                className="btn btn-secondary"
+                type="button"
+                onClick={resetFilters}
+                disabled={!hasActiveFilters}
+              >
+                Reset Filters
+              </button>
+            </div>
+          </section>
+
+          <section className="main-grid">
+            <aside className="panel">
+              <div className="panel-header">
+                <h2>{editingId ? "Edit Trade" : "Add Trade"}</h2>
+              </div>
+
+              <form className="trade-form" onSubmit={handleSubmit}>
+                {error && <div className="error-box">{error}</div>}
+
+                <div className="field-row">
+                  <div className="field">
+                    <label htmlFor="symbol">Pair / Symbol</label>
+                    <input
+                      id="symbol"
+                      name="symbol"
+                      value={form.symbol}
+                      onChange={updateField}
+                      placeholder="BTCUSDT"
+                    />
+                  </div>
+
+                  <div className="field">
+                    <label htmlFor="type">Trade Type</label>
+                    <select id="type" name="type" value={form.type} onChange={updateField}>
+                      <option value="long">Long</option>
+                      <option value="short">Short</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="field-row">
+                  <div className="field">
+                    <label htmlFor="entryPrice">Entry Price</label>
+                    <input
+                      id="entryPrice"
+                      name="entryPrice"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={form.entryPrice}
+                      onChange={updateField}
+                      placeholder="65000"
+                    />
+                  </div>
+
+                  <div className="field">
+                    <label htmlFor="exitPrice">Exit Price</label>
+                    <input
+                      id="exitPrice"
+                      name="exitPrice"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={form.exitPrice}
+                      onChange={updateField}
+                      placeholder="67000"
+                    />
+                  </div>
+                </div>
+
+                <div className="field-row">
+                  <div className="field">
+                    <label htmlFor="positionSize">Position Size (Qty)</label>
+                    <input
+                      id="positionSize"
+                      name="positionSize"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={form.positionSize}
+                      onChange={updateField}
+                      placeholder="0.05"
+                    />
+                  </div>
+
+                  <div className="field">
+                    <label htmlFor="date">Date</label>
+                    <input
+                      id="date"
+                      name="date"
+                      type="date"
+                      value={form.date}
+                      onChange={updateField}
+                    />
+                  </div>
+                </div>
+
+                <div className="field-row">
+                  <div className="field">
+                    <label htmlFor="accountBalanceBefore">Account Balance Before</label>
+                    <input
+                      id="accountBalanceBefore"
+                      name="accountBalanceBefore"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={form.accountBalanceBefore}
+                      onChange={updateField}
+                      placeholder="10000"
+                    />
+                  </div>
+
+                  <div className="field">
+                    <label htmlFor="riskAmount">Risk Amount</label>
+                    <input
+                      id="riskAmount"
+                      name="riskAmount"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={form.riskAmount}
+                      onChange={updateField}
+                      placeholder="200"
+                    />
+                  </div>
+                </div>
+
+                <div className="field-row">
+                  <div className="field">
+                    <label htmlFor="stopLossPrice">Stop Loss Price</label>
+                    <input
+                      id="stopLossPrice"
+                      name="stopLossPrice"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={form.stopLossPrice}
+                      onChange={updateField}
+                      placeholder="64000"
+                    />
+                  </div>
+
+                  <div className="field">
+                    <label htmlFor="takeProfitPrice">Take Profit Price</label>
+                    <input
+                      id="takeProfitPrice"
+                      name="takeProfitPrice"
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={form.takeProfitPrice}
+                      onChange={updateField}
+                      placeholder="69000"
+                    />
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label htmlFor="emotion">Emotion</label>
+                  <input
+                    id="emotion"
+                    name="emotion"
+                    value={form.emotion}
+                    onChange={updateField}
+                    placeholder="Calm, anxious, confident"
+                  />
+                </div>
+
+                <div className="field">
+                  <label htmlFor="screenshotUrl">Screenshot URL</label>
+                  <input
+                    id="screenshotUrl"
+                    name="screenshotUrl"
+                    type="url"
+                    value={form.screenshotUrl}
+                    onChange={updateField}
+                    placeholder="https://example.com/chart.png"
+                  />
+                </div>
+
+                <div className="field">
+                  <label>Upload Chart Screenshot</label>
+                  <div className="upload-row">
+                    <button className="btn btn-secondary" type="button" onClick={openScreenshotPicker}>
+                      Choose Image
+                    </button>
+                    {form.screenshotImage && (
+                      <button className="btn btn-danger" type="button" onClick={removeScreenshotImage}>
+                        Remove Image
+                      </button>
+                    )}
+                    <span className="upload-hint">
+                      JPG, PNG, WebP, or GIF up to {formatFileSize(MAX_SCREENSHOT_SIZE_BYTES)}.
+                    </span>
+                    <input
+                      ref={screenshotInputRef}
+                      className="hidden-file-input"
+                      type="file"
+                      accept={ALLOWED_SCREENSHOT_TYPES.join(",")}
+                      onChange={handleScreenshotUpload}
+                    />
+                  </div>
+                  {form.screenshotImage && (
+                    <div className="screenshot-preview-card">
+                      <img src={form.screenshotImage.dataUrl} alt="Selected chart screenshot preview" />
+                      <div className="screenshot-preview-meta">
+                        <strong>{form.screenshotImage.name}</strong>
+                        <span>{formatFileSize(form.screenshotImage.size)} saved as base64</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="field">
+                  <label htmlFor="notes">Notes</label>
+                  <textarea
+                    id="notes"
+                    name="notes"
+                    value={form.notes}
+                    onChange={updateField}
+                    placeholder="Setup, reason for entry, lesson learned"
+                  />
+                </div>
+
+                <div className="form-actions">
+                  {editingId && (
+                    <button className="btn btn-secondary" type="button" onClick={resetForm}>
+                      Cancel
+                    </button>
+                  )}
+                  <button className="btn btn-primary" type="submit" disabled={isSaving}>
+                    {isSaving ? "Saving..." : editingId ? "Save Changes" : "Add Trade"}
+                  </button>
+                </div>
+              </form>
+            </aside>
+
+            <section className="panel table-panel">
+              <div className="panel-header">
+                <h2>All Trades</h2>
+                <span className="panel-meta">
+                  {filteredTradesWithResults.length} shown
+                </span>
+              </div>
+
+              {filteredTradesWithResults.length === 0 ? (
+                <div className="empty-state">
+                  <strong>{tradesWithResults.length === 0 ? "No trades yet" : "No matching trades"}</strong>
+                  {tradesWithResults.length === 0
+                    ? "Your trades will appear here after you add them."
+                    : "Adjust or clear the filters to see more trades."}
+                </div>
+              ) : (
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Symbol</th>
+                        <th>Type</th>
+                        <th>Entry</th>
+                        <th>Exit</th>
+                        <th>Size (Qty)</th>
+                        <th>P/L</th>
+                        <th>P/L %</th>
+                        <th>Risk</th>
+                        <th>R:R</th>
+                        <th>Emotion</th>
+                        <th>Notes</th>
+                        <th>Screenshot</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredTradesWithResults.map((trade) => {
+                        return (
+                          <tr key={trade.id}>
+                            <td data-label="Date">{trade.date}</td>
+                            <td data-label="Symbol" className="symbol-cell">{trade.symbol}</td>
+                            <td data-label="Type">
+                              <span className={`type-badge type-${trade.type}`}>
+                                {trade.type}
+                              </span>
+                            </td>
+                            <td data-label="Entry">{formatNumber(trade.entryPrice)}</td>
+                            <td data-label="Exit">{formatNumber(trade.exitPrice)}</td>
+                            <td data-label="Size">{formatNumber(trade.positionSize)}</td>
+                            <td data-label="P/L" className={getResultClass(trade.profitLoss)}>
+                              {formatMoney(trade.profitLoss, true)}
+                            </td>
+                            <td data-label="P/L %" className={getResultClass(trade.profitLossPercent)}>
+                              {formatPercent(trade.profitLossPercent)}
+                            </td>
+                            <td data-label="Risk">
+                              {trade.riskPercent > 0 ? (
+                                <span className={`risk-badge ${trade.isHighRisk ? "risk-warning" : "risk-ok"}`}>
+                                  {trade.isHighRisk ? "High " : ""}{formatRiskPercent(trade.riskPercent)}
+                                </span>
+                              ) : (
+                                "-"
+                              )}
+                            </td>
+                            <td data-label="R:R">
+                              {trade.rewardRiskRatio > 0 ? formatRatio(trade.rewardRiskRatio) : "-"}
+                            </td>
+                            <td data-label="Emotion">{trade.emotion || "-"}</td>
+                            <td data-label="Notes" className="notes-cell">{trade.notes || "-"}</td>
+                            <td data-label="Screenshot" className="screenshot-cell">
+                              {trade.screenshotImage || trade.screenshotUrl ? (
+                                <div className="screenshot-links">
+                                  {trade.screenshotImage && (
+                                    <button
+                                      className="thumbnail-button"
+                                      type="button"
+                                      onClick={() => setPreviewImage({
+                                        ...trade.screenshotImage,
+                                        symbol: trade.symbol,
+                                        date: trade.date
+                                      })}
+                                      title="Open screenshot preview"
+                                    >
+                                      <img
+                                        className="trade-thumbnail"
+                                        src={trade.screenshotImage.dataUrl}
+                                        alt={`${trade.symbol} chart screenshot`}
+                                      />
+                                    </button>
+                                  )}
+                                  {trade.screenshotUrl && (
+                                    <a href={trade.screenshotUrl} target="_blank" rel="noreferrer">
+                                      Open URL
+                                    </a>
+                                  )}
+                                </div>
+                              ) : (
+                                "-"
+                              )}
+                            </td>
+                            <td data-label="Actions">
+                              <div className="actions-cell">
+                                <button
+                                  className="btn btn-secondary btn-small"
+                                  type="button"
+                                  onClick={() => editTrade(trade)}
+                                  disabled={isSaving}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="btn btn-danger btn-small"
+                                  type="button"
+                                  onClick={() => deleteTrade(trade.id)}
+                                  disabled={isSaving}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          </section>
+
+          {previewImage && (
+            <div
+              className="modal-backdrop"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Chart screenshot preview"
+              onClick={() => setPreviewImage(null)}
+            >
+              <div className="modal-panel" onClick={(event) => event.stopPropagation()}>
+                <div className="modal-header">
+                  <div className="modal-title">
+                    <strong>{previewImage.symbol} chart screenshot</strong>
+                    <span>
+                      {previewImage.date} - {previewImage.name} - {formatFileSize(previewImage.size)}
+                    </span>
+                  </div>
+                  <button className="btn btn-secondary btn-small" type="button" onClick={() => setPreviewImage(null)}>
+                    Close
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <img src={previewImage.dataUrl} alt={`${previewImage.symbol} full chart screenshot`} />
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
