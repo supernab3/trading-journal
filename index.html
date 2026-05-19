@@ -1003,6 +1003,11 @@
       margin: 0;
     }
 
+    .ai-review-raw p {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
     .ai-review-section {
       border-top: 1px solid var(--line);
       display: grid;
@@ -1398,6 +1403,10 @@
     }
 
     function normalizeStringList(value) {
+      if (typeof value === "string" && value.trim()) {
+        return [value.trim()].slice(0, 3);
+      }
+
       if (!Array.isArray(value)) {
         return [];
       }
@@ -1408,17 +1417,188 @@
         .slice(0, 3);
     }
 
+    function stripReviewCodeFence(value) {
+      return String(value || "")
+        .trim()
+        .replace(/^```(?:json|markdown|md)?\s*/i, "")
+        .replace(/\s*```$/i, "")
+        .trim();
+    }
+
+    function parseReviewJsonString(value) {
+      if (typeof value !== "string") {
+        return null;
+      }
+
+      const trimmedValue = stripReviewCodeFence(value);
+
+      if (!trimmedValue) {
+        return null;
+      }
+
+      try {
+        return JSON.parse(trimmedValue);
+      } catch (error) {
+        const firstBrace = trimmedValue.indexOf("{");
+        const lastBrace = trimmedValue.lastIndexOf("}");
+
+        if (firstBrace >= 0 && lastBrace > firstBrace) {
+          try {
+            return JSON.parse(trimmedValue.slice(firstBrace, lastBrace + 1));
+          } catch (nestedError) {
+            return null;
+          }
+        }
+
+        return null;
+      }
+    }
+
+    function firstReviewString(...values) {
+      for (const value of values) {
+        if (typeof value === "string" && value.trim()) {
+          return value.trim();
+        }
+
+        if (Array.isArray(value)) {
+          const joinedValue = value
+            .map((item) => typeof item === "string" ? item.trim() : "")
+            .filter(Boolean)
+            .join("\n");
+
+          if (joinedValue) {
+            return joinedValue;
+          }
+        }
+      }
+
+      return "";
+    }
+
+    function getFallbackReviewText(review) {
+      if (typeof review === "string") {
+        return stripReviewCodeFence(review);
+      }
+
+      if (Array.isArray(review)) {
+        return review.map((item) => String(item || "").trim()).filter(Boolean).join("\n");
+      }
+
+      if (!review || typeof review !== "object") {
+        return "";
+      }
+
+      const directText = firstReviewString(
+        review.rawText,
+        review.raw_text,
+        review.reviewText,
+        review.review_text,
+        review.markdown,
+        review.text,
+        review.content,
+        review.output,
+        review.response,
+        review.message,
+        review.result
+      );
+
+      if (directText) {
+        return stripReviewCodeFence(directText);
+      }
+
+      if (!review.summary && !review.assessments && !review.improvementSuggestion && !review.improvement_suggestion) {
+        try {
+          return JSON.stringify(review, null, 2);
+        } catch (error) {
+          return String(review);
+        }
+      }
+
+      return "";
+    }
+
+    function createRawAiReview(rawText, fallbackGeneratedAt = "") {
+      const text = stripReviewCodeFence(rawText);
+
+      if (!text) {
+        return null;
+      }
+
+      const firstLine = text.split("\n").map((line) => line.trim()).find(Boolean) || "AI review";
+
+      return {
+        summary: firstLine.replace(/^#+\s*/, "").slice(0, 220),
+        assessments: {
+          entryQuality: "",
+          exitQuality: "",
+          riskManagement: "",
+          emotionalDiscipline: "",
+          rewardRiskRatio: ""
+        },
+        scores: {
+          entryQuality: 3,
+          exitQuality: 3,
+          riskManagement: 3,
+          emotionalDiscipline: 3,
+          rewardRiskRatio: 3
+        },
+        possibleMistakes: [],
+        improvementSuggestion: "",
+        disclaimer: AI_REVIEW_DISCLAIMER,
+        generatedAt: String(fallbackGeneratedAt || "").trim(),
+        model: "",
+        usage: null,
+        rawText: text,
+        isRawText: true
+      };
+    }
+
     function normalizeAiReview(review, fallbackGeneratedAt = "") {
+      if (typeof review === "string") {
+        const parsedReview = parseReviewJsonString(review);
+
+        if (parsedReview) {
+          return normalizeAiReview(parsedReview, fallbackGeneratedAt);
+        }
+
+        return createRawAiReview(review, fallbackGeneratedAt);
+      }
+
+      if (Array.isArray(review)) {
+        return createRawAiReview(review, fallbackGeneratedAt);
+      }
+
       if (!review || typeof review !== "object") {
         return null;
       }
 
+      const nestedReview = review.review || review.aiReview || review.ai_review;
+
+      if (nestedReview && !review.summary && !review.assessments && !review.improvementSuggestion && !review.improvement_suggestion) {
+        const normalizedNestedReview = normalizeAiReview(nestedReview, fallbackGeneratedAt);
+
+        if (normalizedNestedReview) {
+          return normalizedNestedReview;
+        }
+      }
+
+      const fallbackText = getFallbackReviewText(review);
+      const parsedFallbackText = parseReviewJsonString(fallbackText);
+
+      if (parsedFallbackText) {
+        const normalizedParsedText = normalizeAiReview(parsedFallbackText, fallbackGeneratedAt);
+
+        if (normalizedParsedText) {
+          return normalizedParsedText;
+        }
+      }
+
       const assessments = review.assessments && typeof review.assessments === "object"
         ? review.assessments
-        : {};
+        : (review.analysis && typeof review.analysis === "object" ? review.analysis : {});
       const scores = review.scores && typeof review.scores === "object"
         ? review.scores
-        : {};
+        : (review.rating && typeof review.rating === "object" ? review.rating : {});
       const usage = review.usage && typeof review.usage === "object"
         ? {
             inputTokens: Number(review.usage.inputTokens || review.usage.input_tokens || 0),
@@ -1427,13 +1607,13 @@
           }
         : null;
       const normalizedReview = {
-        summary: String(review.summary || "").trim(),
+        summary: firstReviewString(review.summary, review.overview, review.title),
         assessments: {
-          entryQuality: String(assessments.entryQuality || "").trim(),
-          exitQuality: String(assessments.exitQuality || "").trim(),
-          riskManagement: String(assessments.riskManagement || "").trim(),
-          emotionalDiscipline: String(assessments.emotionalDiscipline || assessments.emotional_discipline || "").trim(),
-          rewardRiskRatio: String(assessments.rewardRiskRatio || assessments.reward_risk_ratio || "").trim()
+          entryQuality: firstReviewString(assessments.entryQuality, assessments.entry_quality, review.entryQuality, review.entry_quality),
+          exitQuality: firstReviewString(assessments.exitQuality, assessments.exit_quality, review.exitQuality, review.exit_quality),
+          riskManagement: firstReviewString(assessments.riskManagement, assessments.risk_management, review.riskManagement, review.risk_management),
+          emotionalDiscipline: firstReviewString(assessments.emotionalDiscipline, assessments.emotional_discipline, review.emotionalDiscipline, review.emotional_discipline),
+          rewardRiskRatio: firstReviewString(assessments.rewardRiskRatio, assessments.reward_risk_ratio, review.rewardRiskRatio, review.reward_risk_ratio)
         },
         scores: {
           entryQuality: normalizeReviewScore(scores.entryQuality || scores.entry_quality),
@@ -1442,15 +1622,35 @@
           emotionalDiscipline: normalizeReviewScore(scores.emotionalDiscipline || scores.emotional_discipline),
           rewardRiskRatio: normalizeReviewScore(scores.rewardRiskRatio || scores.reward_risk_ratio)
         },
-        possibleMistakes: normalizeStringList(review.possibleMistakes || review.possible_mistakes),
-        improvementSuggestion: String(review.improvementSuggestion || review.improvement_suggestion || "").trim(),
+        possibleMistakes: normalizeStringList(review.possibleMistakes || review.possible_mistakes || review.mistakes || review.possibleErrors),
+        improvementSuggestion: firstReviewString(
+          review.improvementSuggestion,
+          review.improvement_suggestion,
+          review.suggestion,
+          review.recommendation,
+          review.nextStep,
+          review.next_step,
+          review.improvement
+        ),
         disclaimer: String(review.disclaimer || AI_REVIEW_DISCLAIMER).trim(),
         generatedAt: String(review.generatedAt || review.generated_at || fallbackGeneratedAt || "").trim(),
         model: String(review.model || "").trim(),
-        usage
+        usage,
+        rawText: fallbackText,
+        isRawText: false
       };
 
-      if (!normalizedReview.summary && !normalizedReview.improvementSuggestion) {
+      const hasStructuredText =
+        normalizedReview.summary ||
+        normalizedReview.improvementSuggestion ||
+        Object.values(normalizedReview.assessments).some(Boolean) ||
+        normalizedReview.possibleMistakes.length > 0;
+
+      if (!hasStructuredText && fallbackText) {
+        return createRawAiReview(fallbackText, fallbackGeneratedAt);
+      }
+
+      if (!hasStructuredText) {
         return null;
       }
 
@@ -2107,46 +2307,65 @@
     }
 
     function AiReviewContent({ review }) {
-      const mistakes = review.possibleMistakes.length
-        ? review.possibleMistakes
+      const normalizedReview = normalizeAiReview(review) || createRawAiReview("AI review was saved, but the payload could not be parsed.");
+      const hasStructuredReview = Boolean(
+        normalizedReview.improvementSuggestion ||
+        normalizedReview.possibleMistakes.length ||
+        Object.values(normalizedReview.assessments).some(Boolean)
+      );
+      const mistakes = normalizedReview.possibleMistakes.length
+        ? normalizedReview.possibleMistakes
         : ["No major mistake was detected from the logged fields."];
 
       return (
         <article className="ai-review-card">
-          <div className="ai-review-summary">{review.summary}</div>
-          <div className="ai-review-grid">
-            {AI_REVIEW_FIELDS.map((field) => {
-              const score = review.scores[field.key];
-              return (
-                <div className="ai-review-row" key={field.key}>
-                  <div className="ai-review-label">
-                    <strong>{field.label}</strong>
-                    <span className={`ai-score ${getReviewScoreClass(score)}`}>
-                      {score}/5
-                    </span>
-                  </div>
-                  <p>{review.assessments[field.key] || "Not enough information logged to judge this clearly."}</p>
+          <div className="ai-review-summary">{normalizedReview.summary || "AI review"}</div>
+
+          {hasStructuredReview ? (
+            <React.Fragment>
+              <div className="ai-review-grid">
+                {AI_REVIEW_FIELDS.map((field) => {
+                  const score = normalizedReview.scores[field.key];
+                  return (
+                    <div className="ai-review-row" key={field.key}>
+                      <div className="ai-review-label">
+                        <strong>{field.label}</strong>
+                        <span className={`ai-score ${getReviewScoreClass(score)}`}>
+                          {score}/5
+                        </span>
+                      </div>
+                      <p>{normalizedReview.assessments[field.key] || "Not enough information logged to judge this clearly."}</p>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="ai-review-section">
+                <h3>Possible Mistakes</h3>
+                <ul>
+                  {mistakes.map((mistake, index) => (
+                    <li key={`${mistake}-${index}`}>{mistake}</li>
+                  ))}
+                </ul>
+              </div>
+              {normalizedReview.improvementSuggestion && (
+                <div className="ai-review-section">
+                  <h3>Improvement Suggestion</h3>
+                  <p>{normalizedReview.improvementSuggestion}</p>
                 </div>
-              );
-            })}
-          </div>
-          <div className="ai-review-section">
-            <h3>Possible Mistakes</h3>
-            <ul>
-              {mistakes.map((mistake, index) => (
-                <li key={`${mistake}-${index}`}>{mistake}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="ai-review-section">
-            <h3>Improvement Suggestion</h3>
-            <p>{review.improvementSuggestion}</p>
-          </div>
+              )}
+            </React.Fragment>
+          ) : (
+            <div className="ai-review-section ai-review-raw">
+              <h3>Review</h3>
+              <p>{normalizedReview.rawText || normalizedReview.summary}</p>
+            </div>
+          )}
+
           <div className="ai-review-footer">
-            <span>{review.disclaimer || AI_REVIEW_DISCLAIMER}</span>
+            <span>{normalizedReview.disclaimer || AI_REVIEW_DISCLAIMER}</span>
             <span>
-              {formatReviewGeneratedAt(review.generatedAt)}
-              {review.model ? ` - ${review.model}` : ""}
+              {formatReviewGeneratedAt(normalizedReview.generatedAt)}
+              {normalizedReview.model ? ` - ${normalizedReview.model}` : ""}
             </span>
           </div>
         </article>
@@ -2444,7 +2663,27 @@
             return;
           }
 
-          setTrades((data || []).map(fromTradeRow).filter(Boolean));
+          const loadedTrades = (data || []).map(fromTradeRow).filter(Boolean);
+          console.debug("[ai-review] Supabase reviews loaded", {
+            tradesWithReview: loadedTrades
+              .filter((trade) => trade.aiReview)
+              .map((trade) => ({
+                id: trade.id,
+                symbol: trade.symbol,
+                reviewType: typeof trade.aiReview,
+                isRawText: Boolean(trade.aiReview?.isRawText),
+                hasSummary: Boolean(trade.aiReview?.summary),
+                hasImprovementSuggestion: Boolean(trade.aiReview?.improvementSuggestion)
+              })),
+            rawReviewPayloads: (data || [])
+              .filter((row) => row.ai_review)
+              .map((row) => ({
+                id: row.id,
+                symbol: row.symbol,
+                ai_review: row.ai_review
+              }))
+          });
+          setTrades(loadedTrades);
         } catch (error) {
           setError("Could not connect to Supabase. Check your project settings and internet connection.");
           setTrades([]);
@@ -3039,6 +3278,11 @@
             : {
                 error: "AI review endpoint returned non-JSON. Make sure /api/ai-review is deployed as a Vercel serverless function."
               };
+          console.debug("[ai-review] endpoint response payload", {
+            requestId: responseBody.requestId || requestId,
+            review: responseBody.review,
+            responseBody
+          });
 
           if (!response.ok) {
             const serverRequestId = responseBody.requestId ? ` Request ID: ${responseBody.requestId}.` : "";
@@ -3056,6 +3300,9 @@
           }
 
           setReviewStatus({ type: "info", text: "Saving AI review to Supabase..." });
+          setTrades((current) =>
+            current.map((item) => (item.id === trade.id ? { ...item, aiReview } : item))
+          );
 
           const { data, error } = await supabaseClient
             .from(TRADES_TABLE)
@@ -3067,6 +3314,12 @@
             .eq("user_id", session.user.id)
             .select()
             .single();
+          console.debug("[ai-review] Supabase save response", {
+            tradeId: trade.id,
+            error,
+            savedAiReview: data?.ai_review,
+            normalizedSavedAiReview: normalizeAiReview(data?.ai_review, data?.ai_review_created_at)
+          });
 
           if (error) {
             throw new Error(
@@ -3074,9 +3327,10 @@
             );
           }
 
-          const savedTrade = fromTradeRow(data) || {
-            ...trade,
-            aiReview
+          const savedTradeFromRow = fromTradeRow(data);
+          const savedTrade = {
+            ...(savedTradeFromRow || trade),
+            aiReview: savedTradeFromRow?.aiReview || aiReview
           };
 
           setTrades((current) =>
