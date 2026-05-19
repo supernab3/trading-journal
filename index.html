@@ -41,8 +41,38 @@
       --radius: 8px;
     }
 
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #07111f;
+      --shell: #e7f7ff;
+      --shell-soft: rgba(226, 232, 240, 0.78);
+      --surface: rgba(15, 23, 42, 0.72);
+      --surface-strong: rgba(15, 23, 42, 0.94);
+      --surface-muted: rgba(30, 41, 59, 0.62);
+      --surface-tint: rgba(15, 23, 42, 0.78);
+      --text: #f8fafc;
+      --muted: #a8b3c7;
+      --line: rgba(148, 163, 184, 0.28);
+      --line-strong: rgba(125, 211, 252, 0.28);
+      --primary: #38bdf8;
+      --primary-dark: #7dd3fc;
+      --green: #34d399;
+      --green-soft: rgba(16, 185, 129, 0.18);
+      --red: #fb7185;
+      --red-soft: rgba(244, 63, 94, 0.18);
+      --amber: #fbbf24;
+      --amber-soft: rgba(251, 191, 36, 0.18);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+      --shadow-soft: 0 18px 48px rgba(0, 0, 0, 0.26);
+    }
+
     * {
       box-sizing: border-box;
+    }
+
+    html {
+      background: var(--bg);
+      transition: background 0.42s ease, color 0.42s ease;
     }
 
     body {
@@ -59,6 +89,15 @@
       letter-spacing: 0;
       overflow-x: hidden;
       position: relative;
+      transition: background 0.42s ease, color 0.42s ease;
+    }
+
+    :root[data-theme="dark"] body {
+      background:
+        linear-gradient(135deg, rgba(14, 165, 233, 0.24) 0%, rgba(14, 165, 233, 0) 36%),
+        linear-gradient(225deg, rgba(236, 72, 153, 0.20) 0%, rgba(236, 72, 153, 0) 38%),
+        linear-gradient(315deg, rgba(34, 197, 94, 0.18) 0%, rgba(34, 197, 94, 0) 46%),
+        linear-gradient(180deg, #08111f 0%, #12162c 48%, #07111f 100%);
     }
 
     body::before {
@@ -93,6 +132,17 @@
       z-index: 0;
     }
 
+    :root[data-theme="dark"] body::before {
+      opacity: 0.34;
+    }
+
+    :root[data-theme="dark"] body::after {
+      background-image:
+        linear-gradient(rgba(125, 211, 252, 0.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(125, 211, 252, 0.08) 1px, transparent 1px);
+      opacity: 0.22;
+    }
+
     #root {
       isolation: isolate;
       min-height: 100vh;
@@ -124,6 +174,25 @@
 
     a:hover {
       text-decoration: underline;
+    }
+
+    .panel,
+    .stat-card,
+    .chart-card,
+    .achievement-card,
+    .achievement-profile-card,
+    .daily-summary-today,
+    .daily-summary-history,
+    .daily-summary-metric,
+    .field input,
+    .field select,
+    .field textarea,
+    .btn,
+    .toggle-button,
+    .modal-panel {
+      transition-property: background, border-color, box-shadow, color, transform;
+      transition-duration: 0.32s;
+      transition-timing-function: ease;
     }
 
     .app-shell {
@@ -231,6 +300,13 @@
       padding: 22px;
     }
 
+    .auth-card-title-row {
+      align-items: flex-start;
+      display: flex;
+      gap: 14px;
+      justify-content: space-between;
+    }
+
     .auth-card-header h1 {
       color: var(--text);
       font-size: 1.8rem;
@@ -240,6 +316,80 @@
     .auth-card-header .subtitle {
       color: var(--muted);
       margin-top: 8px;
+    }
+
+    .toggle-button {
+      align-items: center;
+      backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 999px;
+      box-shadow: 0 10px 24px rgba(23, 32, 51, 0.10);
+      color: #344054;
+      display: inline-flex;
+      flex: 0 0 auto;
+      font-size: 0.78rem;
+      font-weight: 900;
+      gap: 8px;
+      min-height: 36px;
+      padding: 8px 11px;
+      transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, color 0.22s ease, transform 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .toggle-button:hover {
+      border-color: rgba(14, 165, 233, 0.36);
+      box-shadow: 0 14px 30px rgba(14, 165, 233, 0.16);
+      transform: translateY(-2px);
+    }
+
+    .toggle-button:active {
+      transform: scale(0.98);
+    }
+
+    .toggle-dot {
+      background: linear-gradient(135deg, #facc15, #f97316);
+      border-radius: 999px;
+      box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.14);
+      display: inline-block;
+      height: 10px;
+      width: 10px;
+    }
+
+    [aria-pressed="true"] .toggle-dot {
+      background: linear-gradient(135deg, #38bdf8, #7c3aed);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.14);
+    }
+
+    .sound-bars {
+      align-items: end;
+      display: inline-flex;
+      gap: 2px;
+      height: 12px;
+      width: 14px;
+    }
+
+    .sound-bars::before,
+    .sound-bars::after {
+      background: linear-gradient(180deg, var(--primary), var(--violet));
+      border-radius: 999px;
+      content: "";
+      display: block;
+      width: 4px;
+    }
+
+    .sound-bars::before {
+      height: 8px;
+    }
+
+    .sound-bars::after {
+      height: 12px;
+    }
+
+    .toggle-button.is-muted .sound-bars::before,
+    .toggle-button.is-muted .sound-bars::after {
+      background: var(--muted);
+      height: 4px;
     }
 
     .auth-form {
@@ -368,6 +518,36 @@
       }
     }
 
+    @keyframes toastIn {
+      0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.96);
+      }
+
+      70% {
+        transform: translateY(-2px) scale(1.01);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes buttonClick {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(0.97);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
     .stats-grid {
       display: grid;
       gap: 16px;
@@ -401,7 +581,7 @@
 
     .stat-card:hover {
       border-color: rgba(255, 255, 255, 0.92);
-      box-shadow: 0 26px 70px rgba(23, 32, 51, 0.18);
+      box-shadow: 0 26px 70px rgba(23, 32, 51, 0.18), 0 0 0 1px rgba(14, 165, 233, 0.08);
       transform: translateY(-4px);
     }
 
@@ -514,7 +694,7 @@
 
     .panel:hover {
       border-color: rgba(255, 255, 255, 0.9);
-      box-shadow: 0 26px 70px rgba(23, 32, 51, 0.16);
+      box-shadow: 0 26px 70px rgba(23, 32, 51, 0.16), 0 0 42px rgba(14, 165, 233, 0.08);
       transform: translateY(-2px);
     }
 
@@ -562,6 +742,177 @@
 
     .advanced-panel {
       margin-bottom: 18px;
+    }
+
+    .achievement-panel {
+      margin-bottom: 18px;
+    }
+
+    .achievement-content {
+      display: grid;
+      gap: 14px;
+      padding: 16px 18px 18px;
+    }
+
+    .achievement-profile-card {
+      align-items: center;
+      background:
+        linear-gradient(135deg, rgba(14, 165, 233, 0.13), rgba(236, 72, 153, 0.10)),
+        rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.70);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-soft);
+      display: grid;
+      gap: 14px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      padding: 16px;
+    }
+
+    .profile-kicker {
+      color: var(--muted);
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .achievement-profile-card strong {
+      color: var(--text);
+      font-size: 1.35rem;
+      font-weight: 950;
+    }
+
+    .achievement-profile-card p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 750;
+      margin: 5px 0 0;
+    }
+
+    .profile-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .profile-stats span {
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(255, 255, 255, 0.70);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 850;
+      padding: 7px 10px;
+      white-space: nowrap;
+    }
+
+    .profile-stats strong {
+      font-size: 0.82rem;
+      margin-left: 4px;
+    }
+
+    .achievement-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .achievement-card {
+      animation: slideUp 0.36s ease both;
+      background: rgba(255, 255, 255, 0.56);
+      border: 1px solid rgba(255, 255, 255, 0.66);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 30px rgba(23, 32, 51, 0.08);
+      display: grid;
+      gap: 8px;
+      min-height: 174px;
+      padding: 13px;
+      position: relative;
+      transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+    }
+
+    .achievement-card:hover {
+      border-color: rgba(14, 165, 233, 0.34);
+      box-shadow: 0 18px 42px rgba(23, 32, 51, 0.12), 0 0 34px rgba(14, 165, 233, 0.10);
+      transform: translateY(-3px);
+    }
+
+    .achievement-earned {
+      background:
+        linear-gradient(145deg, rgba(220, 252, 231, 0.74), rgba(255, 255, 255, 0.58));
+      border-color: rgba(16, 185, 129, 0.30);
+    }
+
+    .achievement-card-top,
+    .achievement-progress-row {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .achievement-medal {
+      align-items: center;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(124, 58, 237, 0.14));
+      border-radius: 999px;
+      color: var(--primary-dark);
+      display: inline-flex;
+      font-size: 0.7rem;
+      font-weight: 950;
+      height: 30px;
+      justify-content: center;
+      width: 30px;
+    }
+
+    .achievement-earned .achievement-medal {
+      background: linear-gradient(135deg, #22c55e, #06b6d4);
+      color: #ffffff;
+    }
+
+    .achievement-status,
+    .achievement-progress-row {
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 900;
+    }
+
+    .achievement-card > strong {
+      color: var(--text);
+      font-size: 0.96rem;
+      font-weight: 950;
+    }
+
+    .achievement-card p,
+    .achievement-card small {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 720;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    .achievement-progress-track {
+      background: rgba(148, 163, 184, 0.18);
+      border-radius: 999px;
+      height: 9px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .achievement-profile-card > .achievement-progress-track {
+      grid-column: 1 / -1;
+    }
+
+    .achievement-progress-track span {
+      background: linear-gradient(90deg, var(--primary), var(--pink), #facc15);
+      border-radius: inherit;
+      display: block;
+      height: 100%;
+      min-width: 6px;
+      transition: width 0.55s ease;
     }
 
     .advanced-stats-grid {
@@ -845,6 +1196,7 @@
     }
 
     .btn:active {
+      animation: buttonClick 0.18s ease;
       transform: translateY(0) scale(0.99);
     }
 
@@ -1157,6 +1509,81 @@
       max-height: calc(92vh - 104px);
       max-width: 100%;
       object-fit: contain;
+    }
+
+    .achievement-toast {
+      align-items: center;
+      animation: toastIn 0.42s ease both;
+      backdrop-filter: blur(18px) saturate(1.2);
+      background:
+        linear-gradient(135deg, rgba(14, 165, 233, 0.16), rgba(16, 185, 129, 0.12)),
+        rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      border-radius: var(--radius);
+      bottom: 20px;
+      box-shadow: 0 24px 70px rgba(23, 32, 51, 0.22);
+      color: var(--text);
+      display: grid;
+      gap: 12px;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      max-width: min(420px, calc(100% - 28px));
+      padding: 14px;
+      position: fixed;
+      right: 20px;
+      z-index: 40;
+    }
+
+    .achievement-toast-icon {
+      align-items: center;
+      background: linear-gradient(135deg, #22c55e, #06b6d4);
+      border-radius: 999px;
+      box-shadow: 0 10px 24px rgba(14, 165, 233, 0.22);
+      color: #ffffff;
+      display: inline-flex;
+      font-size: 0.78rem;
+      font-weight: 950;
+      height: 44px;
+      justify-content: center;
+      width: 44px;
+    }
+
+    .achievement-toast span {
+      color: var(--muted);
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .achievement-toast strong {
+      display: block;
+      font-size: 1rem;
+      font-weight: 950;
+      margin-top: 3px;
+    }
+
+    .achievement-toast p {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 720;
+      line-height: 1.35;
+      margin: 4px 0 0;
+    }
+
+    .toast-close {
+      align-items: center;
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.70);
+      border-radius: 999px;
+      color: var(--muted);
+      display: inline-flex;
+      font-size: 0.8rem;
+      font-weight: 950;
+      height: 28px;
+      justify-content: center;
+      padding: 0;
+      width: 28px;
     }
 
     .ai-review-modal {
@@ -1588,6 +2015,167 @@
       padding-left: 20px;
     }
 
+    :root[data-theme="dark"] .eyebrow {
+      color: #7dd3fc;
+    }
+
+    :root[data-theme="dark"] .subtitle,
+    :root[data-theme="dark"] .panel-meta,
+    :root[data-theme="dark"] .stat-label,
+    :root[data-theme="dark"] .stat-detail,
+    :root[data-theme="dark"] .daily-summary-title span,
+    :root[data-theme="dark"] .daily-summary-history-main span,
+    :root[data-theme="dark"] .ai-review-trade-strip span,
+    :root[data-theme="dark"] .modal-title span,
+    :root[data-theme="dark"] .upload-hint,
+    :root[data-theme="dark"] .notes-cell,
+    :root[data-theme="dark"] .achievement-card p,
+    :root[data-theme="dark"] .achievement-card small,
+    :root[data-theme="dark"] .achievement-status,
+    :root[data-theme="dark"] .achievement-progress-row,
+    :root[data-theme="dark"] .profile-kicker,
+    :root[data-theme="dark"] .achievement-profile-card p,
+    :root[data-theme="dark"] .achievement-toast p,
+    :root[data-theme="dark"] .achievement-toast span {
+      color: var(--muted);
+    }
+
+    :root[data-theme="dark"] .panel,
+    :root[data-theme="dark"] .auth-card {
+      background: rgba(15, 23, 42, 0.70);
+      border-color: rgba(148, 163, 184, 0.24);
+    }
+
+    :root[data-theme="dark"] .panel-header,
+    :root[data-theme="dark"] .auth-card-header,
+    :root[data-theme="dark"] .modal-header {
+      background:
+        linear-gradient(135deg, rgba(14, 165, 233, 0.13), rgba(236, 72, 153, 0.10)),
+        rgba(15, 23, 42, 0.62);
+      border-color: rgba(148, 163, 184, 0.22);
+    }
+
+    :root[data-theme="dark"] .stat-card,
+    :root[data-theme="dark"] .chart-card,
+    :root[data-theme="dark"] .daily-summary-today,
+    :root[data-theme="dark"] .daily-summary-history,
+    :root[data-theme="dark"] .daily-summary-metric,
+    :root[data-theme="dark"] .daily-summary-history-item,
+    :root[data-theme="dark"] .screenshot-preview-card,
+    :root[data-theme="dark"] .achievement-profile-card,
+    :root[data-theme="dark"] .achievement-card,
+    :root[data-theme="dark"] .ai-review-card,
+    :root[data-theme="dark"] .daily-summary-card,
+    :root[data-theme="dark"] .ai-review-trade-strip {
+      background:
+        linear-gradient(145deg, rgba(30, 41, 59, 0.78), rgba(15, 23, 42, 0.58));
+      border-color: rgba(148, 163, 184, 0.22);
+    }
+
+    :root[data-theme="dark"] .achievement-earned,
+    :root[data-theme="dark"] .stat-green {
+      background:
+        linear-gradient(145deg, rgba(16, 185, 129, 0.20), rgba(15, 23, 42, 0.66));
+    }
+
+    :root[data-theme="dark"] .stat-primary {
+      background:
+        linear-gradient(145deg, rgba(14, 165, 233, 0.22), rgba(15, 23, 42, 0.66));
+    }
+
+    :root[data-theme="dark"] .stat-red {
+      background:
+        linear-gradient(145deg, rgba(244, 63, 94, 0.18), rgba(15, 23, 42, 0.66));
+    }
+
+    :root[data-theme="dark"] .stat-amber {
+      background:
+        linear-gradient(145deg, rgba(251, 191, 36, 0.18), rgba(15, 23, 42, 0.66));
+    }
+
+    :root[data-theme="dark"] .toggle-button,
+    :root[data-theme="dark"] .user-pill,
+    :root[data-theme="dark"] .stat-chip,
+    :root[data-theme="dark"] .profile-stats span,
+    :root[data-theme="dark"] .btn-secondary,
+    :root[data-theme="dark"] .toast-close {
+      background: rgba(15, 23, 42, 0.66);
+      border-color: rgba(148, 163, 184, 0.28);
+      color: #e5edf8;
+    }
+
+    :root[data-theme="dark"] .field label,
+    :root[data-theme="dark"] .symbol-cell,
+    :root[data-theme="dark"] .achievement-card > strong,
+    :root[data-theme="dark"] .achievement-profile-card strong,
+    :root[data-theme="dark"] .daily-summary-title strong,
+    :root[data-theme="dark"] .daily-summary-history-main strong,
+    :root[data-theme="dark"] .ai-review-trade-strip strong,
+    :root[data-theme="dark"] .modal-title strong,
+    :root[data-theme="dark"] .empty-state strong,
+    :root[data-theme="dark"] .auth-card-header h1,
+    :root[data-theme="dark"] .achievement-toast strong {
+      color: var(--text);
+    }
+
+    :root[data-theme="dark"] .field input,
+    :root[data-theme="dark"] .field select,
+    :root[data-theme="dark"] .field textarea {
+      background: rgba(15, 23, 42, 0.72);
+      border-color: rgba(148, 163, 184, 0.32);
+      color: var(--text);
+    }
+
+    :root[data-theme="dark"] .field input:focus,
+    :root[data-theme="dark"] .field select:focus,
+    :root[data-theme="dark"] .field textarea:focus {
+      background: rgba(15, 23, 42, 0.92);
+    }
+
+    :root[data-theme="dark"] th {
+      background: rgba(15, 23, 42, 0.78);
+      color: #cbd5e1;
+    }
+
+    :root[data-theme="dark"] td,
+    :root[data-theme="dark"] .daily-summary-field strong,
+    :root[data-theme="dark"] .daily-summary-field p,
+    :root[data-theme="dark"] .daily-summary-section p,
+    :root[data-theme="dark"] .daily-summary-section li,
+    :root[data-theme="dark"] .ai-review-row p,
+    :root[data-theme="dark"] .ai-review-section p,
+    :root[data-theme="dark"] .ai-review-section ul {
+      color: #dbe6f5;
+    }
+
+    :root[data-theme="dark"] tbody tr:hover {
+      background: rgba(30, 41, 59, 0.56);
+    }
+
+    :root[data-theme="dark"] .empty-state,
+    :root[data-theme="dark"] .ai-loading-card {
+      background:
+        linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(236, 72, 153, 0.08)),
+        rgba(15, 23, 42, 0.54);
+      border-color: rgba(148, 163, 184, 0.26);
+    }
+
+    :root[data-theme="dark"] .modal-panel,
+    :root[data-theme="dark"] .ai-review-body,
+    :root[data-theme="dark"] .daily-summary-body {
+      background: rgba(15, 23, 42, 0.94);
+    }
+
+    :root[data-theme="dark"] .ai-review-summary,
+    :root[data-theme="dark"] .daily-summary-headline,
+    :root[data-theme="dark"] .achievement-toast {
+      background:
+        linear-gradient(135deg, rgba(14, 165, 233, 0.13), rgba(236, 72, 153, 0.10)),
+        rgba(15, 23, 42, 0.86);
+      border-color: rgba(148, 163, 184, 0.24);
+      color: var(--text);
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *,
       *::before,
@@ -1609,6 +2197,10 @@
       }
 
       .advanced-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .achievement-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
@@ -1723,13 +2315,26 @@
         justify-content: flex-start;
       }
 
+      .toggle-button {
+        flex: 1 1 auto;
+      }
+
       .stats-grid,
       .field-row,
       .filters-grid,
       .advanced-stats-grid,
+      .achievement-grid,
       .daily-summary-metrics,
       .daily-summary-grid {
         grid-template-columns: 1fr;
+      }
+
+      .achievement-profile-card {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-stats {
+        justify-content: flex-start;
       }
 
       .daily-summary-field {
@@ -1780,6 +2385,12 @@
         padding: 10px;
       }
 
+      .achievement-toast {
+        bottom: 12px;
+        left: 11px;
+        right: 11px;
+      }
+
       .ai-review-row {
         grid-template-columns: 1fr;
       }
@@ -1822,6 +2433,11 @@
     const MAX_SCREENSHOT_DATA_URL_LENGTH = Math.ceil(MAX_SCREENSHOT_SIZE_BYTES * 1.4);
     const ALLOWED_SCREENSHOT_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
     const RISK_WARNING_PERCENT = 2;
+    const THEME_STORAGE_KEY = "tradingJournal.theme";
+    const SOUND_STORAGE_KEY = "tradingJournal.soundMuted";
+    const ACHIEVEMENT_STORAGE_KEY = "tradingJournal.unlockedAchievements";
+    const CONSISTENCY_STREAK_TARGET = 3;
+    const RISK_MANAGER_TARGET = 3;
     const DEFAULT_FILTERS = {
       search: "",
       result: "all",
@@ -1836,11 +2452,176 @@
       { key: "emotionalDiscipline", label: "Emotional Discipline" },
       { key: "rewardRiskRatio", label: "Reward-to-Risk Ratio" }
     ];
+    const ACHIEVEMENT_DEFINITIONS = [
+      {
+        id: "first-trade",
+        title: "First Trade",
+        description: "Log your first completed trade."
+      },
+      {
+        id: "three-wins",
+        title: "3 Wins in a Row",
+        description: "Build a three-trade winning streak."
+      },
+      {
+        id: "ten-trades",
+        title: "10 Trades Logged",
+        description: "Reach ten total journal entries."
+      },
+      {
+        id: "positive-weekly-pl",
+        title: "Positive Weekly P/L",
+        description: "Finish the current week above break-even."
+      },
+      {
+        id: "risk-manager",
+        title: "Risk Manager",
+        description: "Track three trades without any risk above 2%."
+      },
+      {
+        id: "consistency-streak",
+        title: "Consistency Streak",
+        description: "Log trades across three consecutive trading days."
+      }
+    ];
 
     function getTodayDate() {
       const today = new Date();
       const localTime = today.getTime() - today.getTimezoneOffset() * 60000;
       return new Date(localTime).toISOString().slice(0, 10);
+    }
+
+    function readLocalStorageValue(key, fallbackValue = "") {
+      try {
+        return window.localStorage.getItem(key) ?? fallbackValue;
+      } catch (error) {
+        return fallbackValue;
+      }
+    }
+
+    function writeLocalStorageValue(key, value) {
+      try {
+        window.localStorage.setItem(key, value);
+      } catch (error) {
+        // Local storage can be unavailable in private or restricted browsers.
+      }
+    }
+
+    function getInitialTheme() {
+      const storedTheme = readLocalStorageValue(THEME_STORAGE_KEY, "");
+
+      if (storedTheme === "dark" || storedTheme === "light") {
+        return storedTheme;
+      }
+
+      return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+
+    function getInitialSoundMuted() {
+      return readLocalStorageValue(SOUND_STORAGE_KEY, "false") === "true";
+    }
+
+    function getStoredAchievementIds() {
+      const storedValue = readLocalStorageValue(ACHIEVEMENT_STORAGE_KEY, "[]");
+
+      try {
+        const parsedValue = JSON.parse(storedValue);
+        return Array.isArray(parsedValue)
+          ? parsedValue.map((item) => String(item || "")).filter(Boolean)
+          : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function storeAchievementIds(ids) {
+      writeLocalStorageValue(ACHIEVEMENT_STORAGE_KEY, JSON.stringify([...new Set(ids)]));
+    }
+
+    function getDateFromKey(dateKey) {
+      return new Date(`${dateKey}T00:00:00`);
+    }
+
+    function getDateKey(date) {
+      const localTime = date.getTime() - date.getTimezoneOffset() * 60000;
+      return new Date(localTime).toISOString().slice(0, 10);
+    }
+
+    function getWeekStartDateKey(dateKey) {
+      const date = getDateFromKey(dateKey);
+      const mondayOffset = (date.getDay() + 6) % 7;
+      date.setDate(date.getDate() - mondayOffset);
+      return getDateKey(date);
+    }
+
+    function getPreviousDateKey(dateKey) {
+      const date = getDateFromKey(dateKey);
+      date.setDate(date.getDate() - 1);
+      return getDateKey(date);
+    }
+
+    let successAudioContext = null;
+
+    function getSuccessAudioContext() {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+
+      if (!AudioContext) {
+        return null;
+      }
+
+      if (!successAudioContext) {
+        successAudioContext = new AudioContext();
+      }
+
+      return successAudioContext;
+    }
+
+    function primeSuccessSound(isMuted) {
+      if (isMuted) {
+        return;
+      }
+
+      const audioContext = getSuccessAudioContext();
+      audioContext?.resume?.();
+    }
+
+    function playSoftSuccessSound(isMuted) {
+      if (isMuted) {
+        return;
+      }
+
+      const audioContext = getSuccessAudioContext();
+
+      if (!audioContext) {
+        return;
+      }
+
+      audioContext.resume?.();
+
+      const now = audioContext.currentTime;
+      const gain = audioContext.createGain();
+      const firstTone = audioContext.createOscillator();
+      const secondTone = audioContext.createOscillator();
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.038, now + 0.025);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.34);
+
+      firstTone.type = "sine";
+      firstTone.frequency.setValueAtTime(523.25, now);
+      firstTone.frequency.exponentialRampToValueAtTime(659.25, now + 0.15);
+
+      secondTone.type = "triangle";
+      secondTone.frequency.setValueAtTime(783.99, now + 0.08);
+
+      firstTone.connect(gain);
+      secondTone.connect(gain);
+      gain.connect(audioContext.destination);
+
+      firstTone.start(now);
+      firstTone.stop(now + 0.24);
+      secondTone.start(now + 0.08);
+      secondTone.stop(now + 0.32);
     }
 
     function getDefaultForm() {
@@ -2702,6 +3483,132 @@
       };
     }
 
+    function calculateMaxWinningStreak(trades) {
+      return sortTradesByDate(trades).reduce((streakData, trade) => {
+        const nextCurrent = trade.profitLoss > 0 ? streakData.current + 1 : 0;
+
+        return {
+          current: nextCurrent,
+          max: Math.max(streakData.max, nextCurrent)
+        };
+      }, { current: 0, max: 0 }).max;
+    }
+
+    function calculateConsistencyStreak(trades) {
+      const tradeDates = [...new Set(trades.map((trade) => trade.date).filter(Boolean))].sort();
+
+      if (tradeDates.length === 0) {
+        return 0;
+      }
+
+      let streak = 1;
+      let cursor = tradeDates[tradeDates.length - 1];
+
+      while (tradeDates.includes(getPreviousDateKey(cursor))) {
+        streak += 1;
+        cursor = getPreviousDateKey(cursor);
+      }
+
+      return streak;
+    }
+
+    function calculateCurrentWeeklyProfitLoss(trades, todayDate) {
+      const weekStartDate = getWeekStartDateKey(todayDate);
+
+      return roundToCurrency(
+        trades
+          .filter((trade) => trade.date >= weekStartDate && trade.date <= todayDate)
+          .reduce((total, trade) => total + trade.profitLoss, 0)
+      );
+    }
+
+    function buildAchievement(id, earned, current, target, progressText, detail = "") {
+      const definition = ACHIEVEMENT_DEFINITIONS.find((item) => item.id === id);
+      const progress = target > 0 ? Math.min(1, Math.max(0, current / target)) : (earned ? 1 : 0);
+
+      return {
+        ...definition,
+        earned,
+        current,
+        target,
+        progress,
+        progressText,
+        detail
+      };
+    }
+
+    function calculateAchievements(trades, todayDate) {
+      const totalTrades = trades.length;
+      const winningStreak = calculateMaxWinningStreak(trades);
+      const weeklyProfitLoss = calculateCurrentWeeklyProfitLoss(trades, todayDate);
+      const riskTrackedTrades = trades.filter((trade) => trade.riskPercent > 0);
+      const highRiskTrades = riskTrackedTrades.filter((trade) => trade.isHighRisk).length;
+      const safeRiskTrades = highRiskTrades === 0 ? riskTrackedTrades.length : 0;
+      const consistencyStreak = calculateConsistencyStreak(trades);
+
+      const achievements = [
+        buildAchievement(
+          "first-trade",
+          totalTrades >= 1,
+          Math.min(totalTrades, 1),
+          1,
+          `${Math.min(totalTrades, 1)} / 1 trade`,
+          totalTrades >= 1 ? "Your journal has officially started." : "Save one trade to unlock."
+        ),
+        buildAchievement(
+          "three-wins",
+          winningStreak >= 3,
+          Math.min(winningStreak, 3),
+          3,
+          `${Math.min(winningStreak, 3)} / 3 wins`,
+          "Calculated from the best chronological winning streak."
+        ),
+        buildAchievement(
+          "ten-trades",
+          totalTrades >= 10,
+          Math.min(totalTrades, 10),
+          10,
+          `${Math.min(totalTrades, 10)} / 10 trades`,
+          "Every saved Supabase trade counts."
+        ),
+        buildAchievement(
+          "positive-weekly-pl",
+          weeklyProfitLoss > 0,
+          weeklyProfitLoss > 0 ? 1 : 0,
+          1,
+          `${formatMoney(weeklyProfitLoss, true)} this week`,
+          "Uses trades from the current Monday-to-Sunday week."
+        ),
+        buildAchievement(
+          "risk-manager",
+          riskTrackedTrades.length >= RISK_MANAGER_TARGET && highRiskTrades === 0,
+          Math.min(safeRiskTrades, RISK_MANAGER_TARGET),
+          RISK_MANAGER_TARGET,
+          highRiskTrades > 0
+            ? `${highRiskTrades} high-risk ${highRiskTrades === 1 ? "trade" : "trades"}`
+            : `${Math.min(safeRiskTrades, RISK_MANAGER_TARGET)} / ${RISK_MANAGER_TARGET} safe risks`,
+          "Risk data must be logged, and each risk must stay at or under 2%."
+        ),
+        buildAchievement(
+          "consistency-streak",
+          consistencyStreak >= CONSISTENCY_STREAK_TARGET,
+          Math.min(consistencyStreak, CONSISTENCY_STREAK_TARGET),
+          CONSISTENCY_STREAK_TARGET,
+          `${Math.min(consistencyStreak, CONSISTENCY_STREAK_TARGET)} / ${CONSISTENCY_STREAK_TARGET} days`,
+          "Counts consecutive calendar days ending on your latest logged trade date."
+        )
+      ];
+
+      return {
+        achievements,
+        unlockedCount: achievements.filter((achievement) => achievement.earned).length,
+        weeklyProfitLoss,
+        consistencyStreak,
+        maxWinningStreak: winningStreak,
+        highRiskTrades
+      };
+    }
+
     function buildTradeReviewPayload(trade) {
       const tradeWithResults = addTradeResults(trade);
 
@@ -3255,6 +4162,181 @@
       );
     }
 
+    function getAnimatedValueMeta(value) {
+      if (typeof value === "number") {
+        return {
+          numericValue: value,
+          kind: "number",
+          decimals: Number.isInteger(value) ? 0 : 2,
+          showSign: false
+        };
+      }
+
+      const textValue = String(value ?? "");
+
+      if (!textValue || textValue === "No Losses") {
+        return null;
+      }
+
+      const numericValue = Number(textValue.replace(/[^0-9.-]/g, ""));
+
+      if (!Number.isFinite(numericValue)) {
+        return null;
+      }
+
+      const decimalMatch = textValue.match(/\.(\d+)/);
+
+      return {
+        numericValue,
+        kind: textValue.includes("$") ? "money" : textValue.includes("%") ? "percent" : "number",
+        decimals: decimalMatch ? decimalMatch[1].length : 0,
+        showSign: textValue.trim().startsWith("+")
+      };
+    }
+
+    function AnimatedCounter({ value }) {
+      const valueMeta = getAnimatedValueMeta(value);
+      const [displayValue, setDisplayValue] = useState(valueMeta?.numericValue ?? null);
+      const previousValueRef = useRef(valueMeta?.numericValue ?? null);
+
+      useEffect(() => {
+        if (!valueMeta) {
+          previousValueRef.current = null;
+          setDisplayValue(null);
+          return undefined;
+        }
+
+        const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+        const startValue = Number.isFinite(previousValueRef.current)
+          ? previousValueRef.current
+          : valueMeta.numericValue;
+        const endValue = valueMeta.numericValue;
+
+        if (prefersReducedMotion || startValue === endValue) {
+          previousValueRef.current = endValue;
+          setDisplayValue(endValue);
+          return undefined;
+        }
+
+        let timeoutId = 0;
+        const startTime = Date.now();
+        const duration = 540;
+
+        function step() {
+          const progress = Math.min(1, (Date.now() - startTime) / duration);
+          const easedProgress = 1 - Math.pow(1 - progress, 3);
+          const nextValue = startValue + (endValue - startValue) * easedProgress;
+
+          setDisplayValue(nextValue);
+
+          if (progress < 1) {
+            timeoutId = window.setTimeout(step, 16);
+            return;
+          }
+
+          setDisplayValue(endValue);
+          previousValueRef.current = endValue;
+        }
+
+        step();
+
+        return () => window.clearTimeout(timeoutId);
+      }, [value]);
+
+      if (!valueMeta || displayValue === null) {
+        return value;
+      }
+
+      if (valueMeta.kind === "money") {
+        return formatMoney(displayValue, valueMeta.showSign);
+      }
+
+      if (valueMeta.kind === "percent") {
+        const sign = valueMeta.showSign && displayValue > 0 ? "+" : "";
+        return `${sign}${displayValue.toFixed(valueMeta.decimals)}%`;
+      }
+
+      return displayValue.toFixed(valueMeta.decimals);
+    }
+
+    function AchievementPanel({ achievementData }) {
+      const { achievements, unlockedCount, weeklyProfitLoss, consistencyStreak, maxWinningStreak } = achievementData;
+      const totalAchievements = achievements.length || 1;
+      const completionPercent = Math.round((unlockedCount / totalAchievements) * 100);
+
+      return (
+        <section className="panel achievement-panel" aria-label="Trading achievements">
+          <div className="panel-header">
+            <h2>Achievement Profile</h2>
+            <span className="panel-meta">{unlockedCount} of {totalAchievements} unlocked</span>
+          </div>
+          <div className="achievement-content">
+            <div className="achievement-profile-card">
+              <div>
+                <span className="profile-kicker">Trader Level</span>
+                <strong>Level {Math.max(1, unlockedCount + 1)}</strong>
+                <p>{completionPercent}% achievement completion</p>
+              </div>
+              <div className="profile-stats">
+                <span>Weekly P/L <strong className={getResultClass(weeklyProfitLoss)}>{formatMoney(weeklyProfitLoss, true)}</strong></span>
+                <span>Win Streak <strong>{maxWinningStreak}</strong></span>
+                <span>Day Streak <strong>{consistencyStreak}</strong></span>
+              </div>
+              <div className="achievement-progress-track" aria-label={`${completionPercent}% achievement completion`}>
+                <span style={{ width: `${completionPercent}%` }}></span>
+              </div>
+            </div>
+            <div className="achievement-grid">
+              {achievements.map((achievement) => {
+                const progressPercent = Math.round(achievement.progress * 100);
+                return (
+                  <article
+                    className={`achievement-card ${achievement.earned ? "achievement-earned" : ""}`}
+                    key={achievement.id}
+                  >
+                    <div className="achievement-card-top">
+                      <span className="achievement-medal">{achievement.earned ? "OK" : "GO"}</span>
+                      <span className="achievement-status">{achievement.earned ? "Unlocked" : "In progress"}</span>
+                    </div>
+                    <strong>{achievement.title}</strong>
+                    <p>{achievement.description}</p>
+                    <div className="achievement-progress-row">
+                      <span>{achievement.progressText}</span>
+                      <span>{progressPercent}%</span>
+                    </div>
+                    <div className="achievement-progress-track">
+                      <span style={{ width: `${progressPercent}%` }}></span>
+                    </div>
+                    <small>{achievement.detail}</small>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    function AchievementToast({ achievement, onClose }) {
+      if (!achievement) {
+        return null;
+      }
+
+      return (
+        <div className="achievement-toast" role="status" aria-live="polite">
+          <div className="achievement-toast-icon">OK</div>
+          <div>
+            <span>Achievement unlocked</span>
+            <strong>{achievement.title}</strong>
+            <p>{achievement.description}</p>
+          </div>
+          <button className="toast-close" type="button" onClick={onClose} aria-label="Dismiss achievement">
+            x
+          </button>
+        </div>
+      );
+    }
+
     function SummaryCard({ label, value, detail, chip, accent = "primary", valueClass = "" }) {
       return (
         <article className={`stat-card stat-${accent}`}>
@@ -3262,7 +4344,7 @@
             <div className="stat-label">{label}</div>
             <div className="stat-chip">{chip}</div>
           </div>
-          <div className={`stat-value ${valueClass}`}>{value}</div>
+          <div className={`stat-value ${valueClass}`}><AnimatedCounter value={value} /></div>
           <div className="stat-detail">{detail}</div>
         </article>
       );
@@ -3275,10 +4357,14 @@
       const dailyCanvasRef = useRef(null);
       const equityChartRef = useRef(null);
       const dailyChartRef = useRef(null);
+      const achievementReadyRef = useRef(false);
       const [session, setSession] = useState(null);
       const [isCheckingAuth, setIsCheckingAuth] = useState(true);
       const [isLoadingTrades, setIsLoadingTrades] = useState(false);
+      const [hasFetchedTrades, setHasFetchedTrades] = useState(false);
       const [isSaving, setIsSaving] = useState(false);
+      const [theme, setTheme] = useState(getInitialTheme);
+      const [isMuted, setIsMuted] = useState(getInitialSoundMuted);
       const [authMode, setAuthMode] = useState("login");
       const [authForm, setAuthForm] = useState({ email: "", password: "" });
       const [authMessage, setAuthMessage] = useState({
@@ -3302,6 +4388,17 @@
       const [summaryLoadingDate, setSummaryLoadingDate] = useState("");
       const [summaryError, setSummaryError] = useState("");
       const [summaryStatus, setSummaryStatus] = useState({ type: "", text: "" });
+      const [unlockedAchievementIds, setUnlockedAchievementIds] = useState(getStoredAchievementIds);
+      const [achievementPopup, setAchievementPopup] = useState(null);
+
+      useEffect(() => {
+        document.documentElement.dataset.theme = theme;
+        writeLocalStorageValue(THEME_STORAGE_KEY, theme);
+      }, [theme]);
+
+      useEffect(() => {
+        writeLocalStorageValue(SOUND_STORAGE_KEY, String(isMuted));
+      }, [isMuted]);
 
       useEffect(() => {
         const setupError = getSupabaseSetupError();
@@ -3332,6 +4429,8 @@
 
           if (!nextSession) {
             setTrades([]);
+            setHasFetchedTrades(false);
+            achievementReadyRef.current = false;
             setEditingId(null);
             setForm(getDefaultForm());
             setSaveSuccess("");
@@ -3366,10 +4465,14 @@
         if (!session?.user?.id || !supabaseClient) {
           setTrades([]);
           setDailySummaries([]);
+          setHasFetchedTrades(false);
+          achievementReadyRef.current = false;
           setIsLoadingTrades(false);
           return;
         }
 
+        setHasFetchedTrades(false);
+        achievementReadyRef.current = false;
         fetchTrades();
         fetchDailySummaries();
       }, [session?.user?.id]);
@@ -3420,6 +4523,54 @@
         return buildChartSeries(filteredTradesWithResults);
       }, [filteredTradesWithResults]);
 
+      const achievementData = useMemo(() => {
+        return calculateAchievements(tradesWithResults, todayDate);
+      }, [todayDate, tradesWithResults]);
+
+      useEffect(() => {
+        if (!hasFetchedTrades) {
+          return;
+        }
+
+        const earnedIds = achievementData.achievements
+          .filter((achievement) => achievement.earned)
+          .map((achievement) => achievement.id);
+
+        if (!achievementReadyRef.current) {
+          const mergedIds = [...new Set([...unlockedAchievementIds, ...earnedIds])];
+
+          if (mergedIds.length !== unlockedAchievementIds.length) {
+            setUnlockedAchievementIds(mergedIds);
+            storeAchievementIds(mergedIds);
+          }
+
+          achievementReadyRef.current = true;
+          return;
+        }
+
+        const newlyUnlockedAchievement = achievementData.achievements.find(
+          (achievement) => achievement.earned && !unlockedAchievementIds.includes(achievement.id)
+        );
+
+        if (!newlyUnlockedAchievement) {
+          return;
+        }
+
+        const nextUnlockedIds = [...new Set([...unlockedAchievementIds, newlyUnlockedAchievement.id])];
+        setUnlockedAchievementIds(nextUnlockedIds);
+        storeAchievementIds(nextUnlockedIds);
+        setAchievementPopup(newlyUnlockedAchievement);
+      }, [achievementData, hasFetchedTrades, unlockedAchievementIds]);
+
+      useEffect(() => {
+        if (!achievementPopup) {
+          return undefined;
+        }
+
+        const timeoutId = window.setTimeout(() => setAchievementPopup(null), 4200);
+        return () => window.clearTimeout(timeoutId);
+      }, [achievementPopup]);
+
       useEffect(() => {
         const ChartLibrary = window.Chart;
 
@@ -3427,8 +4578,12 @@
           return;
         }
 
-        const gridColor = "rgba(102, 112, 133, 0.18)";
-        const labelColor = "#526173";
+        const isDarkTheme = theme === "dark";
+        const gridColor = isDarkTheme ? "rgba(148, 163, 184, 0.20)" : "rgba(102, 112, 133, 0.18)";
+        const labelColor = isDarkTheme ? "#cbd5e1" : "#526173";
+        const profitBarColor = isDarkTheme ? "rgba(52, 211, 153, 0.82)" : "rgba(16, 185, 129, 0.78)";
+        const lossBarColor = isDarkTheme ? "rgba(251, 113, 133, 0.82)" : "rgba(244, 63, 94, 0.78)";
+        const lineColor = isDarkTheme ? "#38bdf8" : "#0ea5e9";
 
         equityChartRef.current = new ChartLibrary(equityCanvasRef.current, {
           type: "line",
@@ -3437,11 +4592,11 @@
             datasets: [{
               label: "Cumulative P/L",
               data: chartData.equityCurve.values,
-              borderColor: "#0ea5e9",
-              backgroundColor: "rgba(14, 165, 233, 0.14)",
+              borderColor: lineColor,
+              backgroundColor: isDarkTheme ? "rgba(56, 189, 248, 0.16)" : "rgba(14, 165, 233, 0.14)",
               borderWidth: 3,
               fill: true,
-              pointBackgroundColor: "#0ea5e9",
+              pointBackgroundColor: lineColor,
               pointBorderColor: "#ffffff",
               pointBorderWidth: 2,
               pointRadius: 4,
@@ -3511,10 +4666,10 @@
               label: "Daily P/L",
               data: chartData.dailyProfitLoss.values,
               backgroundColor: chartData.dailyProfitLoss.values.map((value) =>
-                value >= 0 ? "rgba(16, 185, 129, 0.78)" : "rgba(244, 63, 94, 0.78)"
+                value >= 0 ? profitBarColor : lossBarColor
               ),
               borderColor: chartData.dailyProfitLoss.values.map((value) =>
-                value >= 0 ? "#059669" : "#e11d48"
+                value >= 0 ? (isDarkTheme ? "#34d399" : "#059669") : (isDarkTheme ? "#fb7185" : "#e11d48")
               ),
               borderWidth: 1,
               borderRadius: 6
@@ -3567,7 +4722,7 @@
           equityChartRef.current = null;
           dailyChartRef.current = null;
         };
-      }, [chartData]);
+      }, [chartData, theme]);
 
       async function fetchTrades() {
         if (!session?.user?.id || !supabaseClient) {
@@ -3616,6 +4771,7 @@
           setError("Could not connect to Supabase. Check your project settings and internet connection.");
           setTrades([]);
         } finally {
+          setHasFetchedTrades(true);
           setIsLoadingTrades(false);
         }
       }
@@ -3656,6 +4812,22 @@
       function switchAuthMode(mode) {
         setAuthMode(mode);
         setAuthMessage({ type: "", text: "" });
+      }
+
+      function toggleTheme() {
+        setTheme((currentTheme) => currentTheme === "dark" ? "light" : "dark");
+      }
+
+      function toggleSound() {
+        setIsMuted((currentMuted) => {
+          const nextMuted = !currentMuted;
+
+          if (!nextMuted) {
+            primeSuccessSound(false);
+          }
+
+          return nextMuted;
+        });
       }
 
       async function handleAuthSubmit(event) {
@@ -4004,6 +5176,7 @@
 
       async function handleSubmit(event) {
         event.preventDefault();
+        primeSuccessSound(isMuted);
         setSaveSuccess("");
 
         const validationMessage = validateForm();
@@ -4095,6 +5268,7 @@
 
           resetForm();
           setSaveSuccess(editingId ? "Trade updated. Nice save." : "Trade saved. Journal updated.");
+          playSoftSuccessSound(isMuted);
         } catch (error) {
           setError("Could not save trade. Check your Supabase connection and table setup.");
         } finally {
@@ -4196,6 +5370,7 @@
           return;
         }
 
+        primeSuccessSound(isMuted);
         const requestId = createTradeId();
         setReviewTradeId(trade.id);
         setReviewLoadingId(trade.id);
@@ -4302,6 +5477,7 @@
             current.map((item) => (item.id === trade.id ? savedTrade : item))
           );
           setReviewStatus({ type: "success", text: "AI review generated and saved to Supabase." });
+          playSoftSuccessSound(isMuted);
         } catch (error) {
           setReviewError(error.message || "AI review generation failed.");
           setReviewStatus({ type: "error", text: "AI review failed." });
@@ -4329,6 +5505,7 @@
           return;
         }
 
+        primeSuccessSound(isMuted);
         const dailyTrades = tradesWithResults.filter((trade) => trade.date === summaryDate);
 
         if (dailyTrades.length === 0) {
@@ -4411,6 +5588,7 @@
 
           setDailySummaries((current) => upsertDailySummary(current, nextSummary));
           setSummaryStatus({ type: "success", text: "Daily AI summary generated and saved to Supabase." });
+          playSoftSuccessSound(isMuted);
         } catch (error) {
           setSummaryError(error.message || "Daily AI summary generation failed.");
           setSummaryStatus({ type: "error", text: "Daily summary failed." });
@@ -4436,8 +5614,22 @@
           <main className="auth-shell">
             <section className="auth-card">
               <div className="auth-card-header">
-                <p className="eyebrow">Trading Journal</p>
-                <h1>{authMode === "register" ? "Create Account" : "Sign In"}</h1>
+                <div className="auth-card-title-row">
+                  <div>
+                    <p className="eyebrow">Trading Journal</p>
+                    <h1>{authMode === "register" ? "Create Account" : "Sign In"}</h1>
+                  </div>
+                  <button
+                    className="toggle-button"
+                    type="button"
+                    onClick={toggleTheme}
+                    aria-pressed={theme === "dark"}
+                    title="Toggle theme"
+                  >
+                    <span className="toggle-dot"></span>
+                    {theme === "dark" ? "Light" : "Dark"}
+                  </button>
+                </div>
                 <p className="subtitle">
                   Save your journal securely in Supabase and sync it after login.
                 </p>
@@ -4522,6 +5714,26 @@
               </p>
             </div>
             <div className="user-actions">
+              <button
+                className="toggle-button"
+                type="button"
+                onClick={toggleTheme}
+                aria-pressed={theme === "dark"}
+                title="Toggle theme"
+              >
+                <span className="toggle-dot"></span>
+                {theme === "dark" ? "Light" : "Dark"}
+              </button>
+              <button
+                className={`toggle-button ${isMuted ? "is-muted" : ""}`}
+                type="button"
+                onClick={toggleSound}
+                aria-pressed={!isMuted}
+                title={isMuted ? "Unmute sounds" : "Mute sounds"}
+              >
+                <span className="sound-bars"></span>
+                {isMuted ? "Unmute" : "Mute"}
+              </button>
               <div className="user-pill" title={currentUserEmail}>
                 <span className="storage-dot"></span>
                 {currentUserEmail}
@@ -4570,6 +5782,8 @@
               valueClass={getResultClass(metrics.bestTrade?.profitLoss || 0)}
             />
           </section>
+
+          <AchievementPanel achievementData={achievementData} />
 
           <section className="panel advanced-panel" aria-label="Advanced trading statistics">
             <div className="panel-header">
@@ -5504,6 +6718,8 @@
               </div>
             </div>
           )}
+
+          <AchievementToast achievement={achievementPopup} onClose={() => setAchievementPopup(null)} />
         </main>
       );
     }
