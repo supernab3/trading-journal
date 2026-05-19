@@ -209,6 +209,30 @@
       margin-bottom: 18px;
     }
 
+    .spinner {
+      animation: spin 0.8s linear infinite;
+      border: 2px solid rgba(20, 125, 143, 0.18);
+      border-left-color: var(--primary);
+      border-radius: 50%;
+      display: inline-block;
+      flex: 0 0 auto;
+      height: 18px;
+      width: 18px;
+    }
+
+    .btn .spinner {
+      border-color: rgba(255, 255, 255, 0.36);
+      border-left-color: #ffffff;
+      height: 14px;
+      width: 14px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     .stats-grid {
       display: grid;
       gap: 14px;
@@ -576,6 +600,11 @@
       color: var(--red);
     }
 
+    .status-info {
+      background: rgba(20, 125, 143, 0.10);
+      color: var(--primary-dark);
+    }
+
     .form-actions {
       display: flex;
       gap: 10px;
@@ -756,7 +785,13 @@
 
     .actions-cell {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
+      min-width: 190px;
+      white-space: normal;
+    }
+
+    .actions-cell .btn {
       white-space: nowrap;
     }
 
@@ -833,6 +868,181 @@
       max-height: calc(92vh - 104px);
       max-width: 100%;
       object-fit: contain;
+    }
+
+    .ai-review-modal {
+      width: min(760px, 100%);
+    }
+
+    .ai-review-body {
+      background: var(--surface);
+      display: grid;
+      gap: 14px;
+      max-height: calc(92vh - 72px);
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .ai-review-trade-strip {
+      align-items: center;
+      background: var(--surface-muted);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      padding: 12px;
+    }
+
+    .ai-review-trade-strip strong {
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .ai-review-trade-strip span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .ai-loading-card {
+      align-items: center;
+      background: var(--surface-muted);
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      padding: 28px 18px;
+      text-align: center;
+    }
+
+    .ai-loading-card span:last-child {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 750;
+    }
+
+    .ai-review-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .ai-review-summary {
+      background: linear-gradient(180deg, #ffffff, var(--surface-muted));
+      border-bottom: 1px solid var(--line);
+      color: #2a3743;
+      font-size: 0.95rem;
+      font-weight: 800;
+      line-height: 1.45;
+      padding: 14px;
+    }
+
+    .ai-review-grid {
+      display: grid;
+      gap: 0;
+    }
+
+    .ai-review-row {
+      align-items: start;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      gap: 10px;
+      grid-template-columns: minmax(130px, 0.8fr) minmax(0, 2fr);
+      padding: 13px 14px;
+    }
+
+    .ai-review-row:last-child {
+      border-bottom: 0;
+    }
+
+    .ai-review-label {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .ai-review-label strong {
+      color: var(--text);
+      font-size: 0.86rem;
+      font-weight: 900;
+    }
+
+    .ai-score {
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      padding: 4px 8px;
+      white-space: nowrap;
+    }
+
+    .ai-score-high {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .ai-score-mid {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .ai-score-low {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .ai-review-row p,
+    .ai-review-section p {
+      color: #405060;
+      font-size: 0.92rem;
+      font-weight: 650;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .ai-review-section {
+      border-top: 1px solid var(--line);
+      display: grid;
+      gap: 9px;
+      padding: 14px;
+    }
+
+    .ai-review-section h3 {
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .ai-review-section ul {
+      color: #405060;
+      display: grid;
+      font-size: 0.92rem;
+      font-weight: 650;
+      gap: 7px;
+      line-height: 1.45;
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .ai-review-footer {
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      font-weight: 800;
+      gap: 8px 14px;
+      justify-content: space-between;
+      padding: 12px 14px;
+    }
+
+    .ai-review-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
     }
 
     @media (max-width: 1060px) {
@@ -1000,6 +1210,14 @@
         padding: 10px;
       }
 
+      .ai-review-row {
+        grid-template-columns: 1fr;
+      }
+
+      .ai-review-actions {
+        flex-direction: column-reverse;
+      }
+
       td {
         grid-template-columns: 1fr;
         gap: 5px;
@@ -1015,6 +1233,8 @@
     const SUPABASE_URL = "https://spuqofvejpbktfuwiwsy.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_BxzvNWXpNDLkPiYpRNtvNQ_4Pd83yqi";
     const TRADES_TABLE = "trades";
+    const AI_REVIEW_ENDPOINT = "/api/ai-review";
+    const AI_REVIEW_DISCLAIMER = "Educational review only; not financial advice or a guarantee of future results.";
     const SUPABASE_KEY_IS_SECRET = SUPABASE_ANON_KEY.startsWith("sb_secret_");
     const SUPABASE_IS_CONFIGURED =
       SUPABASE_URL.startsWith("https://") &&
@@ -1036,6 +1256,13 @@
       startDate: "",
       endDate: ""
     };
+    const AI_REVIEW_FIELDS = [
+      { key: "entryQuality", label: "Entry Quality" },
+      { key: "exitQuality", label: "Exit Quality" },
+      { key: "riskManagement", label: "Risk Management" },
+      { key: "emotionalDiscipline", label: "Emotional Discipline" },
+      { key: "rewardRiskRatio", label: "Reward-to-Risk Ratio" }
+    ];
 
     function getTodayDate() {
       const today = new Date();
@@ -1160,6 +1387,76 @@
       };
     }
 
+    function normalizeReviewScore(value) {
+      const score = Number(value);
+
+      if (!Number.isFinite(score)) {
+        return 3;
+      }
+
+      return Math.min(5, Math.max(1, Math.round(score)));
+    }
+
+    function normalizeStringList(value) {
+      if (!Array.isArray(value)) {
+        return [];
+      }
+
+      return value
+        .map((item) => String(item || "").trim())
+        .filter(Boolean)
+        .slice(0, 3);
+    }
+
+    function normalizeAiReview(review, fallbackGeneratedAt = "") {
+      if (!review || typeof review !== "object") {
+        return null;
+      }
+
+      const assessments = review.assessments && typeof review.assessments === "object"
+        ? review.assessments
+        : {};
+      const scores = review.scores && typeof review.scores === "object"
+        ? review.scores
+        : {};
+      const usage = review.usage && typeof review.usage === "object"
+        ? {
+            inputTokens: Number(review.usage.inputTokens || review.usage.input_tokens || 0),
+            outputTokens: Number(review.usage.outputTokens || review.usage.output_tokens || 0),
+            totalTokens: Number(review.usage.totalTokens || review.usage.total_tokens || 0)
+          }
+        : null;
+      const normalizedReview = {
+        summary: String(review.summary || "").trim(),
+        assessments: {
+          entryQuality: String(assessments.entryQuality || "").trim(),
+          exitQuality: String(assessments.exitQuality || "").trim(),
+          riskManagement: String(assessments.riskManagement || "").trim(),
+          emotionalDiscipline: String(assessments.emotionalDiscipline || assessments.emotional_discipline || "").trim(),
+          rewardRiskRatio: String(assessments.rewardRiskRatio || assessments.reward_risk_ratio || "").trim()
+        },
+        scores: {
+          entryQuality: normalizeReviewScore(scores.entryQuality || scores.entry_quality),
+          exitQuality: normalizeReviewScore(scores.exitQuality || scores.exit_quality),
+          riskManagement: normalizeReviewScore(scores.riskManagement || scores.risk_management),
+          emotionalDiscipline: normalizeReviewScore(scores.emotionalDiscipline || scores.emotional_discipline),
+          rewardRiskRatio: normalizeReviewScore(scores.rewardRiskRatio || scores.reward_risk_ratio)
+        },
+        possibleMistakes: normalizeStringList(review.possibleMistakes || review.possible_mistakes),
+        improvementSuggestion: String(review.improvementSuggestion || review.improvement_suggestion || "").trim(),
+        disclaimer: String(review.disclaimer || AI_REVIEW_DISCLAIMER).trim(),
+        generatedAt: String(review.generatedAt || review.generated_at || fallbackGeneratedAt || "").trim(),
+        model: String(review.model || "").trim(),
+        usage
+      };
+
+      if (!normalizedReview.summary && !normalizedReview.improvementSuggestion) {
+        return null;
+      }
+
+      return normalizedReview;
+    }
+
     function roundTo(value, decimals = 2) {
       const multiplier = 10 ** decimals;
       const rounded = Math.round((value + Number.EPSILON) * multiplier) / multiplier;
@@ -1190,7 +1487,11 @@
         emotion: String(trade.emotion || "").trim(),
         notes: String(trade.notes || "").trim(),
         screenshotUrl: String(trade.screenshotUrl || "").trim(),
-        screenshotImage: normalizeScreenshotImage(trade.screenshotImage)
+        screenshotImage: normalizeScreenshotImage(trade.screenshotImage),
+        aiReview: normalizeAiReview(
+          trade.aiReview || trade.ai_review,
+          trade.aiReviewCreatedAt || trade.ai_review_created_at
+        )
       };
 
       if (!normalizedTrade.symbol || !hasValidTradeNumbers(normalizedTrade)) {
@@ -1207,7 +1508,7 @@
         return null;
       }
 
-      return {
+      const row = {
         user_id: userId,
         symbol: normalizedTrade.symbol,
         trade_type: normalizedTrade.type,
@@ -1224,6 +1525,13 @@
         screenshot_url: normalizedTrade.screenshotUrl,
         screenshot_image: normalizedTrade.screenshotImage
       };
+
+      if (normalizedTrade.aiReview) {
+        row.ai_review = normalizedTrade.aiReview;
+        row.ai_review_created_at = normalizedTrade.aiReview.generatedAt || new Date().toISOString();
+      }
+
+      return row;
     }
 
     function fromTradeRow(row) {
@@ -1242,7 +1550,9 @@
         emotion: row.emotion,
         notes: row.notes,
         screenshotUrl: row.screenshot_url,
-        screenshotImage: row.screenshot_image
+        screenshotImage: row.screenshot_image,
+        aiReview: row.ai_review,
+        aiReviewCreatedAt: row.ai_review_created_at
       });
     }
 
@@ -1600,6 +1910,31 @@
       };
     }
 
+    function buildTradeReviewPayload(trade) {
+      const tradeWithResults = addTradeResults(trade);
+
+      return {
+        symbol: tradeWithResults.symbol,
+        type: tradeWithResults.type,
+        date: tradeWithResults.date,
+        entryPrice: tradeWithResults.entryPrice,
+        exitPrice: tradeWithResults.exitPrice,
+        positionSize: tradeWithResults.positionSize,
+        accountBalanceBefore: tradeWithResults.accountBalanceBefore,
+        riskAmount: tradeWithResults.riskAmount,
+        stopLossPrice: tradeWithResults.stopLossPrice,
+        takeProfitPrice: tradeWithResults.takeProfitPrice,
+        profitLoss: tradeWithResults.profitLoss,
+        profitLossPercent: tradeWithResults.profitLossPercent,
+        riskPercent: tradeWithResults.riskPercent,
+        rewardRiskRatio: tradeWithResults.rewardRiskRatio,
+        riskWarningLevelPercent: RISK_WARNING_PERCENT,
+        isHighRisk: tradeWithResults.isHighRisk,
+        emotion: tradeWithResults.emotion || "Not provided",
+        notes: tradeWithResults.notes || "Not provided"
+      };
+    }
+
     function getExportFileName(extension) {
       return `trading-journal-${getTodayDate()}.${extension}`;
     }
@@ -1648,7 +1983,10 @@
         "Notes",
         "Screenshot URL",
         "Uploaded Screenshot",
-        "Screenshot File"
+        "Screenshot File",
+        "AI Review Summary",
+        "AI Improvement Suggestion",
+        "AI Review Date"
       ];
 
       const rows = trades.map((trade) => {
@@ -1674,7 +2012,10 @@
           tradeWithResults.notes,
           tradeWithResults.screenshotUrl,
           tradeWithResults.screenshotImage ? "Yes" : "No",
-          tradeWithResults.screenshotImage?.name || ""
+          tradeWithResults.screenshotImage?.name || "",
+          tradeWithResults.aiReview?.summary || "",
+          tradeWithResults.aiReview?.improvementSuggestion || "",
+          tradeWithResults.aiReview?.generatedAt || ""
         ];
       });
 
@@ -1736,6 +2077,82 @@
       return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     }
 
+    function getReviewScoreClass(score) {
+      if (score >= 4) {
+        return "ai-score-high";
+      }
+
+      if (score >= 3) {
+        return "ai-score-mid";
+      }
+
+      return "ai-score-low";
+    }
+
+    function formatReviewGeneratedAt(value) {
+      if (!value) {
+        return "Just now";
+      }
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return value;
+      }
+
+      return new Intl.DateTimeFormat("en-US", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(date);
+    }
+
+    function AiReviewContent({ review }) {
+      const mistakes = review.possibleMistakes.length
+        ? review.possibleMistakes
+        : ["No major mistake was detected from the logged fields."];
+
+      return (
+        <article className="ai-review-card">
+          <div className="ai-review-summary">{review.summary}</div>
+          <div className="ai-review-grid">
+            {AI_REVIEW_FIELDS.map((field) => {
+              const score = review.scores[field.key];
+              return (
+                <div className="ai-review-row" key={field.key}>
+                  <div className="ai-review-label">
+                    <strong>{field.label}</strong>
+                    <span className={`ai-score ${getReviewScoreClass(score)}`}>
+                      {score}/5
+                    </span>
+                  </div>
+                  <p>{review.assessments[field.key] || "Not enough information logged to judge this clearly."}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="ai-review-section">
+            <h3>Possible Mistakes</h3>
+            <ul>
+              {mistakes.map((mistake, index) => (
+                <li key={`${mistake}-${index}`}>{mistake}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="ai-review-section">
+            <h3>Improvement Suggestion</h3>
+            <p>{review.improvementSuggestion}</p>
+          </div>
+          <div className="ai-review-footer">
+            <span>{review.disclaimer || AI_REVIEW_DISCLAIMER}</span>
+            <span>
+              {formatReviewGeneratedAt(review.generatedAt)}
+              {review.model ? ` - ${review.model}` : ""}
+            </span>
+          </div>
+        </article>
+      );
+    }
+
     function SummaryCard({ label, value, detail, chip, accent = "primary", valueClass = "" }) {
       return (
         <article className={`stat-card stat-${accent}`}>
@@ -1773,6 +2190,10 @@
       const [error, setError] = useState("");
       const [backupMessage, setBackupMessage] = useState({ type: "", text: "" });
       const [previewImage, setPreviewImage] = useState(null);
+      const [reviewTradeId, setReviewTradeId] = useState(null);
+      const [reviewLoadingId, setReviewLoadingId] = useState(null);
+      const [reviewError, setReviewError] = useState("");
+      const [reviewStatus, setReviewStatus] = useState({ type: "", text: "" });
 
       useEffect(() => {
         const setupError = getSupabaseSetupError();
@@ -1805,6 +2226,10 @@
             setTrades([]);
             setEditingId(null);
             setForm(getDefaultForm());
+            setReviewTradeId(null);
+            setReviewLoadingId(null);
+            setReviewError("");
+            setReviewStatus({ type: "", text: "" });
           }
         });
 
@@ -1827,6 +2252,14 @@
       const tradesWithResults = useMemo(() => {
         return trades.map(addTradeResults);
       }, [trades]);
+
+      const selectedReviewTrade = useMemo(() => {
+        if (!reviewTradeId) {
+          return null;
+        }
+
+        return tradesWithResults.find((trade) => trade.id === reviewTradeId) || null;
+      }, [reviewTradeId, tradesWithResults]);
 
       const filteredTradesWithResults = useMemo(() => {
         return tradesWithResults.filter((trade) => tradeMatchesFilters(trade, filters));
@@ -2101,6 +2534,10 @@
         setAuthMessage({ type: "success", text: "Logged out." });
         setBackupMessage({ type: "", text: "" });
         setPreviewImage(null);
+        setReviewTradeId(null);
+        setReviewLoadingId(null);
+        setReviewError("");
+        setReviewStatus({ type: "", text: "" });
       }
 
       function updateField(event) {
@@ -2525,10 +2962,132 @@
           if (editingId === id) {
             resetForm();
           }
+          if (reviewTradeId === id) {
+            closeAiReview();
+          }
         } catch (error) {
           setError("Could not delete trade. Check your Supabase connection.");
         } finally {
           setIsSaving(false);
+        }
+      }
+
+      function openAiReview(trade) {
+        setReviewTradeId(trade.id);
+        setReviewError("");
+        setReviewStatus({ type: "", text: "" });
+      }
+
+      function closeAiReview() {
+        setReviewTradeId(null);
+        setReviewError("");
+        setReviewStatus({ type: "", text: "" });
+      }
+
+      async function generateAiReview(trade) {
+        if (!session?.user?.id || !supabaseClient) {
+          setReviewError("Log in before generating AI reviews.");
+          setReviewTradeId(trade.id);
+          setReviewStatus({ type: "error", text: "AI review failed." });
+          return;
+        }
+
+        const requestId = createTradeId();
+        setReviewTradeId(trade.id);
+        setReviewLoadingId(trade.id);
+        setReviewError("");
+        setReviewStatus({ type: "info", text: "Generating AI review with Gemini..." });
+
+        try {
+          const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+          const accessToken = sessionData?.session?.access_token || session.access_token;
+
+          if (sessionError || !accessToken) {
+            throw new Error("Your Supabase session expired. Please log in again before generating AI reviews.");
+          }
+
+          const controller = new AbortController();
+          const timeoutId = window.setTimeout(() => controller.abort(), 45000);
+          let response;
+
+          try {
+            response = await fetch(AI_REVIEW_ENDPOINT, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+                "X-Review-Request-Id": requestId
+              },
+              body: JSON.stringify({
+                trade: buildTradeReviewPayload(trade)
+              }),
+              signal: controller.signal
+            });
+          } catch (error) {
+            if (error.name === "AbortError") {
+              throw new Error("Gemini review timed out. Please try again.");
+            }
+
+            throw new Error("Could not reach the AI review endpoint. Check the Vercel deployment and network connection.");
+          } finally {
+            window.clearTimeout(timeoutId);
+          }
+
+          const contentType = response.headers.get("content-type") || "";
+          const responseBody = contentType.includes("application/json")
+            ? await response.json().catch(() => ({}))
+            : {
+                error: "AI review endpoint returned non-JSON. Make sure /api/ai-review is deployed as a Vercel serverless function."
+              };
+
+          if (!response.ok) {
+            const serverRequestId = responseBody.requestId ? ` Request ID: ${responseBody.requestId}.` : "";
+            throw new Error(`${responseBody.error || "AI review could not be generated."}${serverRequestId}`);
+          }
+
+          if (!responseBody.review) {
+            throw new Error("AI review endpoint returned no review data.");
+          }
+
+          const aiReview = normalizeAiReview(responseBody.review);
+
+          if (!aiReview) {
+            throw new Error("AI returned an incomplete review.");
+          }
+
+          setReviewStatus({ type: "info", text: "Saving AI review to Supabase..." });
+
+          const { data, error } = await supabaseClient
+            .from(TRADES_TABLE)
+            .update({
+              ai_review: aiReview,
+              ai_review_created_at: aiReview.generatedAt || new Date().toISOString()
+            })
+            .eq("id", trade.id)
+            .eq("user_id", session.user.id)
+            .select()
+            .single();
+
+          if (error) {
+            throw new Error(
+              `AI review was generated, but Supabase could not save it. Run the ai_review SQL migration. ${error.message}`
+            );
+          }
+
+          const savedTrade = fromTradeRow(data) || {
+            ...trade,
+            aiReview
+          };
+
+          setTrades((current) =>
+            current.map((item) => (item.id === trade.id ? savedTrade : item))
+          );
+          setReviewStatus({ type: "success", text: "AI review generated and saved to Supabase." });
+        } catch (error) {
+          setReviewError(error.message || "AI review generation failed.");
+          setReviewStatus({ type: "error", text: "AI review failed." });
+        } finally {
+          setReviewLoadingId(null);
         }
       }
 
@@ -3279,6 +3838,29 @@
                             <td data-label="Actions">
                               <div className="actions-cell">
                                 <button
+                                  className="btn btn-primary btn-small"
+                                  type="button"
+                                  onClick={() => generateAiReview(trade)}
+                                  disabled={isSaving || Boolean(reviewLoadingId)}
+                                >
+                                  {reviewLoadingId === trade.id && <span className="spinner"></span>}
+                                  {reviewLoadingId === trade.id
+                                    ? "Reviewing..."
+                                    : trade.aiReview
+                                      ? "Regenerate AI Review"
+                                      : "Generate AI Review"}
+                                </button>
+                                {trade.aiReview && (
+                                  <button
+                                    className="btn btn-secondary btn-small"
+                                    type="button"
+                                    onClick={() => openAiReview(trade)}
+                                    disabled={isSaving}
+                                  >
+                                    View AI Review
+                                  </button>
+                                )}
+                                <button
                                   className="btn btn-secondary btn-small"
                                   type="button"
                                   onClick={() => editTrade(trade)}
@@ -3305,6 +3887,85 @@
               )}
             </section>
           </section>
+
+          {selectedReviewTrade && (
+            <div
+              className="modal-backdrop"
+              role="dialog"
+              aria-modal="true"
+              aria-label="AI trade review"
+              onClick={closeAiReview}
+            >
+              <div className="modal-panel ai-review-modal" onClick={(event) => event.stopPropagation()}>
+                <div className="modal-header">
+                  <div className="modal-title">
+                    <strong>{selectedReviewTrade.symbol} AI trade review</strong>
+                    <span>
+                      {selectedReviewTrade.date} - {selectedReviewTrade.type} - {formatMoney(selectedReviewTrade.profitLoss, true)}
+                    </span>
+                  </div>
+                  <button className="btn btn-secondary btn-small" type="button" onClick={closeAiReview}>
+                    Close
+                  </button>
+                </div>
+                <div className="ai-review-body">
+                  <div className="ai-review-trade-strip">
+                    <strong>{selectedReviewTrade.symbol}</strong>
+                    <span>R:R {selectedReviewTrade.rewardRiskRatio > 0 ? formatRatio(selectedReviewTrade.rewardRiskRatio) : "not logged"}</span>
+                    <span>Risk {selectedReviewTrade.riskPercent > 0 ? formatRiskPercent(selectedReviewTrade.riskPercent) : "not logged"}</span>
+                    <span className={getResultClass(selectedReviewTrade.profitLoss)}>
+                      P/L {formatMoney(selectedReviewTrade.profitLoss, true)}
+                    </span>
+                  </div>
+
+                  {reviewStatus.text && (
+                    <div className={`status-box status-${reviewStatus.type || "info"}`}>
+                      {reviewStatus.text}
+                    </div>
+                  )}
+
+                  {reviewError && (
+                    <div className="error-box">{reviewError}</div>
+                  )}
+
+                  {reviewLoadingId === selectedReviewTrade.id && (
+                    <div className="ai-loading-card" aria-live="polite">
+                      <span className="spinner"></span>
+                      <strong>Generating AI review...</strong>
+                      <span>Checking entry, exit, risk, emotion, and process notes.</span>
+                    </div>
+                  )}
+
+                  {selectedReviewTrade.aiReview && (
+                    <AiReviewContent review={selectedReviewTrade.aiReview} />
+                  )}
+
+                  {!selectedReviewTrade.aiReview && reviewLoadingId !== selectedReviewTrade.id && (
+                    <div className="empty-state">
+                      <strong>No AI review yet</strong>
+                      Generate a review to get concise process feedback for this trade.
+                    </div>
+                  )}
+
+                  <div className="ai-review-actions">
+                    <button
+                      className="btn btn-primary"
+                      type="button"
+                      onClick={() => generateAiReview(selectedReviewTrade)}
+                      disabled={isSaving || Boolean(reviewLoadingId)}
+                    >
+                      {reviewLoadingId === selectedReviewTrade.id && <span className="spinner"></span>}
+                      {reviewLoadingId === selectedReviewTrade.id
+                        ? "Reviewing..."
+                        : selectedReviewTrade.aiReview
+                          ? "Regenerate AI Review"
+                          : "Generate AI Review"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {previewImage && (
             <div

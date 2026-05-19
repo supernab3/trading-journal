@@ -7,16 +7,18 @@ A Vercel-ready static React trading journal that uses Supabase Auth and a Supaba
 - Sign up, login, and logout with Supabase Auth
 - Add, edit, delete, filter, export, and import trades
 - Track P/L, advanced statistics, equity curve charts, screenshots, and risk management fields
+- Generate concise AI trade reviews for entry, exit, risk, discipline, R:R, mistakes, and next-step improvement
 - Each user only sees their own trades through Row Level Security
 
 ## Project Structure
 
 - `index.html` - the full app, styles, Supabase client, and React logic
+- `api/ai-review.js` - Vercel serverless endpoint that calls Gemini securely
 - `vercel.json` - Vercel static deployment settings
 - `package.json` - optional Vercel CLI scripts
 - `.gitignore` - ignores Vercel and dependency folders
 
-The app is intentionally static. Vercel serves `index.html` directly, so no build step is required.
+The frontend is intentionally static. Vercel serves `index.html` directly, and the AI review endpoint runs as a Vercel serverless function.
 
 ## Supabase Values
 
@@ -27,6 +29,53 @@ These values are already set in `index.html`:
 
 Do not put a secret key (`sb_secret_...`) or service role key in this frontend file.
 Those keys are backend-only and should be rotated if they were shared.
+
+## Gemini API Key
+
+Do not place the Gemini API key in `index.html`. It belongs on the server only.
+
+For local Vercel testing, create a `.env.local` file:
+
+```bash
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL=gemini-3.1-flash-lite
+```
+
+`GEMINI_MODEL` is optional. If it is not set, the API endpoint uses `gemini-3.1-flash-lite`, a fast cost-efficient Gemini model. You can also set it to another supported Gemini Flash model.
+
+For Vercel production:
+
+1. Open Vercel Dashboard.
+2. Go to Project > Settings > Environment Variables.
+3. Add `GEMINI_API_KEY`.
+4. Optionally add `GEMINI_MODEL`.
+5. Redeploy the project.
+
+## How AI Review Generation Works
+
+1. The user clicks `Generate AI Review` on a trade row.
+2. The browser sends the trade data and the current Supabase auth token to `/api/ai-review`.
+3. The serverless endpoint verifies the Supabase user token.
+4. The endpoint sends a concise mentor-style prompt to the Gemini `generateContent` API.
+5. Gemini returns structured JSON with scores, comments, possible mistakes, and one improvement suggestion.
+6. The browser saves that review back to the same Supabase trade row.
+
+The prompt tells the AI to act like a professional trading mentor, stay practical, avoid financial guarantees, and focus on discipline and process.
+
+If generation fails, the AI review modal shows the server error and a request ID when available. The Vercel Function logs also include safe debug events for that request ID, Gemini status, model, schema mode, finish reason, and token usage. They do not log the Gemini API key, Supabase token, or full trade payload.
+
+## How AI Reviews Are Stored
+
+AI reviews are stored on the existing `public.trades` table:
+
+- `ai_review` stores the structured JSON review.
+- `ai_review_created_at` stores the generated timestamp.
+
+Each trade keeps its own latest review. Regenerating an AI review replaces the previous review for that trade.
+
+## Estimated API Cost Per Review
+
+As of May 18, 2026, `gemini-3.1-flash-lite` standard pricing is $0.25 per 1M input tokens and $1.50 per 1M output tokens. A typical trade review is roughly 700-1,000 input tokens and 250-450 output tokens, so the estimated paid-tier cost is about `$0.0006-$0.0009` per review. Google may also provide free-tier quota depending on your account and region.
 
 ## Supabase SQL
 
@@ -52,8 +101,14 @@ create table if not exists public.trades (
   notes text default '',
   screenshot_url text default '',
   screenshot_image jsonb,
+  ai_review jsonb,
+  ai_review_created_at timestamptz,
   created_at timestamptz not null default now()
 );
+
+alter table public.trades
+  add column if not exists ai_review jsonb,
+  add column if not exists ai_review_created_at timestamptz;
 
 alter table public.trades enable row level security;
 
