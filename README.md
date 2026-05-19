@@ -8,17 +8,19 @@ A Vercel-ready static React trading journal that uses Supabase Auth and a Supaba
 - Add, edit, delete, filter, export, and import trades
 - Track P/L, advanced statistics, equity curve charts, screenshots, and risk management fields
 - Generate concise AI trade reviews for entry, exit, risk, discipline, R:R, mistakes, and next-step improvement
+- Generate daily AI trading summaries with history by date
 - Each user only sees their own trades through Row Level Security
 
 ## Project Structure
 
 - `index.html` - the full app, styles, Supabase client, and React logic
 - `api/ai-review.js` - Vercel serverless endpoint that calls Gemini securely
+- `api/daily-summary.js` - Vercel serverless endpoint that generates and saves daily Gemini summaries
 - `vercel.json` - Vercel static deployment settings
 - `package.json` - optional Vercel CLI scripts
 - `.gitignore` - ignores Vercel and dependency folders
 
-The frontend is intentionally static. Vercel serves `index.html` directly, and the AI review endpoint runs as a Vercel serverless function.
+The frontend is intentionally static. Vercel serves `index.html` directly, and the AI endpoints run as Vercel serverless functions.
 
 ## Supabase Values
 
@@ -64,6 +66,17 @@ The prompt tells the AI to act like a professional trading mentor, stay practica
 
 If generation fails, the AI review modal shows the server error and a request ID when available. The Vercel Function logs also include safe debug events for that request ID, Gemini status, model, schema mode, finish reason, and token usage. They do not log the Gemini API key, Supabase token, or full trade payload.
 
+## How Daily AI Summaries Work
+
+1. The user clicks `Generate Daily AI Summary`.
+2. The browser automatically filters trades where `trade_date` equals today's local date.
+3. The browser aggregates total trades, total P/L, win rate, best trade, worst trade, average risk, high-risk trade count, emotions, notes, and any saved AI trade review text.
+4. The browser sends that daily payload and the current Supabase auth token to `/api/daily-summary`.
+5. The serverless endpoint verifies the Supabase user token, calls Gemini securely, and saves the summary to Supabase.
+6. The frontend updates the Daily Summary modal and history immediately from the saved response.
+
+The endpoint returns a concise mentor-style JSON summary with the most repeated mistake, emotional pattern, risk management quality, and top 3 improvements for tomorrow.
+
 ## How AI Reviews Are Stored
 
 AI reviews are stored on the existing `public.trades` table:
@@ -73,9 +86,18 @@ AI reviews are stored on the existing `public.trades` table:
 
 Each trade keeps its own latest review. Regenerating an AI review replaces the previous review for that trade.
 
-## Estimated API Cost Per Review
+## How Daily Summary History Works
 
-As of May 18, 2026, `gemini-3.1-flash-lite` standard pricing is $0.25 per 1M input tokens and $1.50 per 1M output tokens. A typical trade review is roughly 700-1,000 input tokens and 250-450 output tokens, so the estimated paid-tier cost is about `$0.0006-$0.0009` per review. Google may also provide free-tier quota depending on your account and region.
+Daily summaries are stored in `public.daily_ai_summaries`, one row per user per date. Regenerating a date updates that same row through the `(user_id, summary_date)` unique constraint, so the history list always shows the latest saved summary for each date.
+
+## Estimated Gemini API Costs
+
+As of May 19, 2026, Google's Gemini API pricing page lists `gemini-3.1-flash-lite` paid-tier text pricing at $0.25 per 1M input tokens and $1.50 per 1M output tokens.
+
+- A typical trade review is roughly 700-1,000 input tokens and 250-450 output tokens, so the estimated paid-tier cost is about `$0.0006-$0.0009` per review.
+- A typical daily summary with 5-15 trades is roughly 2,000-5,000 input tokens and 500-900 output tokens, so the estimated paid-tier cost is about `$0.0013-$0.0026` per summary.
+
+Google may also provide free-tier quota depending on your account and region. Check the official [Gemini API pricing page](https://ai.google.dev/gemini-api/docs/pricing) before budgeting production usage because model pricing can change.
 
 ## Supabase SQL
 
@@ -110,15 +132,30 @@ alter table public.trades
   add column if not exists ai_review jsonb,
   add column if not exists ai_review_created_at timestamptz;
 
+create table if not exists public.daily_ai_summaries (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
+  summary_date date not null,
+  summary_json jsonb not null,
+  created_at timestamptz not null default now(),
+  unique (user_id, summary_date)
+);
+
 alter table public.trades enable row level security;
+alter table public.daily_ai_summaries enable row level security;
 
 grant usage on schema public to authenticated;
 grant select, insert, update, delete on public.trades to authenticated;
+grant select, insert, update, delete on public.daily_ai_summaries to authenticated;
 
 drop policy if exists "Users can read their own trades" on public.trades;
 drop policy if exists "Users can insert their own trades" on public.trades;
 drop policy if exists "Users can update their own trades" on public.trades;
 drop policy if exists "Users can delete their own trades" on public.trades;
+drop policy if exists "Users can read their own daily summaries" on public.daily_ai_summaries;
+drop policy if exists "Users can insert their own daily summaries" on public.daily_ai_summaries;
+drop policy if exists "Users can update their own daily summaries" on public.daily_ai_summaries;
+drop policy if exists "Users can delete their own daily summaries" on public.daily_ai_summaries;
 
 create policy "Users can read their own trades"
 on public.trades
@@ -141,6 +178,31 @@ with check ((select auth.uid()) = user_id);
 
 create policy "Users can delete their own trades"
 on public.trades
+for delete
+to authenticated
+using ((select auth.uid()) = user_id);
+
+create policy "Users can read their own daily summaries"
+on public.daily_ai_summaries
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
+
+create policy "Users can insert their own daily summaries"
+on public.daily_ai_summaries
+for insert
+to authenticated
+with check ((select auth.uid()) = user_id);
+
+create policy "Users can update their own daily summaries"
+on public.daily_ai_summaries
+for update
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+create policy "Users can delete their own daily summaries"
+on public.daily_ai_summaries
 for delete
 to authenticated
 using ((select auth.uid()) = user_id);
@@ -197,6 +259,10 @@ When prompted:
 - Register user B and confirm user A's trades are not visible.
 - Add, edit, and delete trades.
 - Test filters, stats, risk cards, and charts after each change.
+- Add at least one trade dated today, then generate a Daily AI Summary.
+- Confirm the summary appears in the modal without refresh and in Summary History.
+- Regenerate the same date and confirm the existing history row updates.
+- Log in as another user and confirm daily summary history is private.
 - Upload a small screenshot and confirm the thumbnail/modal works.
 - Export JSON, import it back, and confirm rows save to Supabase.
 - Refresh the deployed page and confirm the logged-in session and trades load again.

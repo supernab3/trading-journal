@@ -1050,6 +1050,231 @@
       justify-content: flex-end;
     }
 
+    .daily-summary-panel {
+      margin-bottom: 18px;
+    }
+
+    .daily-summary-content {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      padding: 16px 18px 18px;
+    }
+
+    .daily-summary-today,
+    .daily-summary-history {
+      background: var(--surface-muted);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .daily-summary-title {
+      display: grid;
+      gap: 4px;
+    }
+
+    .daily-summary-title strong {
+      color: var(--text);
+      font-size: 0.98rem;
+      font-weight: 900;
+    }
+
+    .daily-summary-title span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 750;
+    }
+
+    .daily-summary-metrics {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .daily-summary-metric {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      display: grid;
+      gap: 4px;
+      padding: 11px;
+    }
+
+    .daily-summary-metric span {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .daily-summary-metric strong {
+      color: var(--text);
+      font-size: 1.15rem;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .daily-summary-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .daily-summary-history-list {
+      display: grid;
+      gap: 9px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .daily-summary-history-item {
+      align-items: start;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      display: grid;
+      gap: 8px;
+      padding: 11px;
+    }
+
+    .daily-summary-history-main {
+      display: grid;
+      gap: 3px;
+    }
+
+    .daily-summary-history-main strong {
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 900;
+    }
+
+    .daily-summary-history-main span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .daily-summary-history-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .daily-summary-modal {
+      width: min(820px, 100%);
+    }
+
+    .daily-summary-body {
+      background: var(--surface);
+      display: grid;
+      gap: 14px;
+      max-height: calc(92vh - 72px);
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .daily-summary-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .daily-summary-headline {
+      background: linear-gradient(180deg, #ffffff, var(--surface-muted));
+      border-bottom: 1px solid var(--line);
+      color: #2a3743;
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+    }
+
+    .daily-summary-headline strong {
+      color: var(--text);
+      font-size: 1.02rem;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .daily-summary-headline span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .daily-summary-grid {
+      display: grid;
+      gap: 0;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .daily-summary-field {
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      display: grid;
+      gap: 5px;
+      padding: 13px 14px;
+    }
+
+    .daily-summary-field:nth-child(3n) {
+      border-right: 0;
+    }
+
+    .daily-summary-field span {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .daily-summary-field strong,
+    .daily-summary-field p {
+      color: #405060;
+      font-size: 0.92rem;
+      font-weight: 750;
+      line-height: 1.4;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .daily-summary-section {
+      border-top: 1px solid var(--line);
+      display: grid;
+      gap: 9px;
+      padding: 14px;
+    }
+
+    .daily-summary-section h3 {
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .daily-summary-section p,
+    .daily-summary-section li {
+      color: #405060;
+      font-size: 0.92rem;
+      font-weight: 650;
+      line-height: 1.45;
+    }
+
+    .daily-summary-section p,
+    .daily-summary-section ul {
+      margin: 0;
+    }
+
+    .daily-summary-section ul {
+      display: grid;
+      gap: 7px;
+      padding-left: 20px;
+    }
+
     @media (max-width: 1060px) {
       .stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1064,6 +1289,10 @@
       }
 
       .charts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .daily-summary-content {
         grid-template-columns: 1fr;
       }
 
@@ -1167,8 +1396,14 @@
       .stats-grid,
       .field-row,
       .filters-grid,
-      .advanced-stats-grid {
+      .advanced-stats-grid,
+      .daily-summary-metrics,
+      .daily-summary-grid {
         grid-template-columns: 1fr;
+      }
+
+      .daily-summary-field {
+        border-right: 0;
       }
 
       .stat-card,
@@ -1238,8 +1473,11 @@
     const SUPABASE_URL = "https://spuqofvejpbktfuwiwsy.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_BxzvNWXpNDLkPiYpRNtvNQ_4Pd83yqi";
     const TRADES_TABLE = "trades";
+    const DAILY_SUMMARIES_TABLE = "daily_ai_summaries";
     const AI_REVIEW_ENDPOINT = "/api/ai-review";
+    const DAILY_SUMMARY_ENDPOINT = "/api/daily-summary";
     const AI_REVIEW_DISCLAIMER = "Educational review only; not financial advice or a guarantee of future results.";
+    const DAILY_SUMMARY_DISCLAIMER = "Educational trading journal summary only; not financial advice or a guarantee of future results.";
     const SUPABASE_KEY_IS_SECRET = SUPABASE_ANON_KEY.startsWith("sb_secret_");
     const SUPABASE_IS_CONFIGURED =
       SUPABASE_URL.startsWith("https://") &&
@@ -2135,6 +2373,206 @@
       };
     }
 
+    function normalizeDailySummaryText(value, fallback = "") {
+      return String(value || fallback).trim();
+    }
+
+    function parseDailySummaryNumber(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function normalizeDailySummaryList(value) {
+      const list = Array.isArray(value) ? value : [value];
+      return list
+        .map((item) => normalizeDailySummaryText(item))
+        .filter(Boolean)
+        .slice(0, 3);
+    }
+
+    function normalizeDailySummaryTrade(value) {
+      if (!value || typeof value !== "object") {
+        return {
+          symbol: "",
+          profitLoss: 0,
+          note: "No trade available."
+        };
+      }
+
+      return {
+        symbol: normalizeDailySummaryText(value.symbol).toUpperCase(),
+        profitLoss: parseDailySummaryNumber(value.profitLoss),
+        note: normalizeDailySummaryText(value.note, "No extra note.")
+      };
+    }
+
+    function normalizeDailySummary(summary, fallbackDate = "", fallbackCreatedAt = "") {
+      if (typeof summary === "string") {
+        const parsedSummary = parseReviewJsonString(summary);
+
+        if (parsedSummary) {
+          return normalizeDailySummary(parsedSummary, fallbackDate, fallbackCreatedAt);
+        }
+
+        return {
+          summaryDate: fallbackDate || getTodayDate(),
+          headline: stripReviewCodeFence(summary),
+          totalTrades: 0,
+          totalProfitLoss: 0,
+          winRate: 0,
+          bestTrade: normalizeDailySummaryTrade(null),
+          worstTrade: normalizeDailySummaryTrade(null),
+          mostRepeatedMistake: "No structured mistake field was returned.",
+          emotionalPattern: "No structured emotional pattern was returned.",
+          riskManagementQuality: "No structured risk assessment was returned.",
+          topImprovementsForTomorrow: [],
+          mentorNote: "",
+          disclaimer: DAILY_SUMMARY_DISCLAIMER,
+          generatedAt: fallbackCreatedAt || "",
+          model: "",
+          usage: null,
+          rawText: stripReviewCodeFence(summary)
+        };
+      }
+
+      if (!summary || typeof summary !== "object") {
+        return null;
+      }
+
+      const nestedSummary = summary.summary || summary.dailySummary || summary.daily_summary;
+
+      if (nestedSummary && !summary.headline && !summary.totalTrades && !summary.total_trades) {
+        const normalizedNestedSummary = normalizeDailySummary(nestedSummary, fallbackDate, fallbackCreatedAt);
+
+        if (normalizedNestedSummary) {
+          return normalizedNestedSummary;
+        }
+      }
+
+      return {
+        summaryDate: normalizeDailySummaryText(summary.summaryDate || summary.summary_date, fallbackDate || getTodayDate()),
+        headline: normalizeDailySummaryText(summary.headline || summary.summary || summary.overview, "Daily trading summary generated."),
+        totalTrades: Math.max(0, Math.round(parseDailySummaryNumber(summary.totalTrades ?? summary.total_trades))),
+        totalProfitLoss: parseDailySummaryNumber(summary.totalProfitLoss ?? summary.total_profit_loss ?? summary.totalPL ?? summary.total_pl),
+        winRate: parseDailySummaryNumber(summary.winRate ?? summary.win_rate),
+        bestTrade: normalizeDailySummaryTrade(summary.bestTrade || summary.best_trade),
+        worstTrade: normalizeDailySummaryTrade(summary.worstTrade || summary.worst_trade),
+        mostRepeatedMistake: normalizeDailySummaryText(
+          summary.mostRepeatedMistake || summary.most_repeated_mistake,
+          "No repeated mistake was clear from today's logs."
+        ),
+        emotionalPattern: normalizeDailySummaryText(
+          summary.emotionalPattern || summary.emotional_pattern,
+          "No strong emotional pattern was logged."
+        ),
+        riskManagementQuality: normalizeDailySummaryText(
+          summary.riskManagementQuality || summary.risk_management_quality,
+          "Risk management quality was unclear from today's logs."
+        ),
+        topImprovementsForTomorrow: normalizeDailySummaryList(
+          summary.topImprovementsForTomorrow || summary.top_improvements_for_tomorrow || summary.improvements
+        ),
+        mentorNote: normalizeDailySummaryText(summary.mentorNote || summary.mentor_note),
+        disclaimer: normalizeDailySummaryText(summary.disclaimer, DAILY_SUMMARY_DISCLAIMER),
+        generatedAt: normalizeDailySummaryText(summary.generatedAt || summary.generated_at, fallbackCreatedAt),
+        model: normalizeDailySummaryText(summary.model),
+        usage: summary.usage && typeof summary.usage === "object" ? summary.usage : null,
+        rawText: normalizeDailySummaryText(summary.rawText || summary.raw_text)
+      };
+    }
+
+    function fromDailySummaryRow(row) {
+      if (!row || typeof row !== "object") {
+        return null;
+      }
+
+      const summary = normalizeDailySummary(row.summary_json, row.summary_date, row.created_at);
+
+      if (!summary) {
+        return null;
+      }
+
+      return {
+        id: row.id,
+        userId: row.user_id,
+        summaryDate: row.summary_date || summary.summaryDate,
+        summary,
+        createdAt: row.created_at || summary.generatedAt
+      };
+    }
+
+    function sortDailySummaries(summaries) {
+      return [...summaries].sort((first, second) =>
+        String(second.summaryDate || "").localeCompare(String(first.summaryDate || ""))
+      );
+    }
+
+    function upsertDailySummary(currentSummaries, nextSummary) {
+      const filteredSummaries = currentSummaries.filter((summary) => summary.summaryDate !== nextSummary.summaryDate);
+      return sortDailySummaries([nextSummary, ...filteredSummaries]);
+    }
+
+    function getReviewTextForDailySummary(aiReview) {
+      const normalizedReview = normalizeAiReview(aiReview);
+
+      if (!normalizedReview) {
+        return "";
+      }
+
+      return [
+        normalizedReview.summary,
+        ...Object.values(normalizedReview.assessments || {}),
+        ...(normalizedReview.possibleMistakes || []),
+        normalizedReview.improvementSuggestion,
+        normalizedReview.rawText
+      ]
+        .map((item) => normalizeDailySummaryText(item))
+        .filter(Boolean)
+        .join(" ");
+    }
+
+    function buildDailySummaryPayload(summaryDate, trades) {
+      const dailyTrades = trades.filter((trade) => trade.date === summaryDate);
+      const metrics = calculateStats(dailyTrades);
+
+      return {
+        summaryDate,
+        metrics: {
+          totalTrades: metrics.totalTrades,
+          totalProfitLoss: metrics.totalProfit,
+          winRate: metrics.winrate,
+          averageRiskPercent: metrics.averageRiskPercent,
+          highRiskTrades: metrics.highRiskTrades,
+          bestTrade: metrics.bestTrade
+            ? {
+                symbol: metrics.bestTrade.symbol,
+                profitLoss: metrics.bestTrade.profitLoss,
+                note: `${metrics.bestTrade.type} trade, R:R ${metrics.bestTrade.rewardRiskRatio || "not logged"}`
+              }
+            : null,
+          worstTrade: metrics.worstTrade
+            ? {
+                symbol: metrics.worstTrade.symbol,
+                profitLoss: metrics.worstTrade.profitLoss,
+                note: `${metrics.worstTrade.type} trade, R:R ${metrics.worstTrade.rewardRiskRatio || "not logged"}`
+              }
+            : null
+        },
+        trades: dailyTrades.map((trade) => ({
+          symbol: trade.symbol,
+          type: trade.type,
+          profitLoss: trade.profitLoss,
+          profitLossPercent: trade.profitLossPercent,
+          riskPercent: trade.riskPercent,
+          rewardRiskRatio: trade.rewardRiskRatio,
+          emotion: trade.emotion || "Not provided",
+          notes: trade.notes || "Not provided",
+          aiReviewSummary: getReviewTextForDailySummary(trade.aiReview),
+          aiReviewMistakes: trade.aiReview?.possibleMistakes || []
+        }))
+      };
+    }
+
     function getExportFileName(extension) {
       return `trading-journal-${getTodayDate()}.${extension}`;
     }
@@ -2372,6 +2810,97 @@
       );
     }
 
+    function DailySummaryContent({ summary }) {
+      const normalizedSummary = normalizeDailySummary(summary);
+
+      if (!normalizedSummary) {
+        return (
+          <div className="empty-state">
+            <strong>Summary unavailable</strong>
+            The saved daily summary could not be displayed.
+          </div>
+        );
+      }
+
+      const improvements = normalizedSummary.topImprovementsForTomorrow.length
+        ? normalizedSummary.topImprovementsForTomorrow
+        : ["Define one A+ setup before trading.", "Write invalidation before entry.", "Stop after breaking a risk rule."];
+
+      return (
+        <article className="daily-summary-card">
+          <div className="daily-summary-headline">
+            <strong>{normalizedSummary.headline}</strong>
+            <span>
+              {normalizedSummary.summaryDate} - {formatReviewGeneratedAt(normalizedSummary.generatedAt)}
+              {normalizedSummary.model ? ` - ${normalizedSummary.model}` : ""}
+            </span>
+          </div>
+
+          <div className="daily-summary-grid">
+            <div className="daily-summary-field">
+              <span>Total Trades</span>
+              <strong>{normalizedSummary.totalTrades}</strong>
+            </div>
+            <div className="daily-summary-field">
+              <span>Total P/L</span>
+              <strong className={getResultClass(normalizedSummary.totalProfitLoss)}>
+                {formatMoney(normalizedSummary.totalProfitLoss, true)}
+              </strong>
+            </div>
+            <div className="daily-summary-field">
+              <span>Win Rate</span>
+              <strong>{formatWinRate(normalizedSummary.winRate)}</strong>
+            </div>
+            <div className="daily-summary-field">
+              <span>Best Trade</span>
+              <p>
+                {normalizedSummary.bestTrade.symbol || "-"} {formatMoney(normalizedSummary.bestTrade.profitLoss, true)}
+                {normalizedSummary.bestTrade.note ? ` - ${normalizedSummary.bestTrade.note}` : ""}
+              </p>
+            </div>
+            <div className="daily-summary-field">
+              <span>Worst Trade</span>
+              <p>
+                {normalizedSummary.worstTrade.symbol || "-"} {formatMoney(normalizedSummary.worstTrade.profitLoss, true)}
+                {normalizedSummary.worstTrade.note ? ` - ${normalizedSummary.worstTrade.note}` : ""}
+              </p>
+            </div>
+            <div className="daily-summary-field">
+              <span>Repeated Mistake</span>
+              <p>{normalizedSummary.mostRepeatedMistake}</p>
+            </div>
+          </div>
+
+          <div className="daily-summary-section">
+            <h3>Emotional Pattern</h3>
+            <p>{normalizedSummary.emotionalPattern}</p>
+          </div>
+          <div className="daily-summary-section">
+            <h3>Risk Management Quality</h3>
+            <p>{normalizedSummary.riskManagementQuality}</p>
+          </div>
+          <div className="daily-summary-section">
+            <h3>Top 3 Improvements for Tomorrow</h3>
+            <ul>
+              {improvements.map((improvement, index) => (
+                <li key={`${improvement}-${index}`}>{improvement}</li>
+              ))}
+            </ul>
+          </div>
+          {normalizedSummary.mentorNote && (
+            <div className="daily-summary-section">
+              <h3>Mentor Note</h3>
+              <p>{normalizedSummary.mentorNote}</p>
+            </div>
+          )}
+          <div className="ai-review-footer">
+            <span>{normalizedSummary.disclaimer || DAILY_SUMMARY_DISCLAIMER}</span>
+            <span>{normalizedSummary.usage?.totalTokens ? `${normalizedSummary.usage.totalTokens} tokens` : "Saved summary"}</span>
+          </div>
+        </article>
+      );
+    }
+
     function SummaryCard({ label, value, detail, chip, accent = "primary", valueClass = "" }) {
       return (
         <article className={`stat-card stat-${accent}`}>
@@ -2413,6 +2942,11 @@
       const [reviewLoadingId, setReviewLoadingId] = useState(null);
       const [reviewError, setReviewError] = useState("");
       const [reviewStatus, setReviewStatus] = useState({ type: "", text: "" });
+      const [dailySummaries, setDailySummaries] = useState([]);
+      const [selectedDailySummaryDate, setSelectedDailySummaryDate] = useState(null);
+      const [summaryLoadingDate, setSummaryLoadingDate] = useState("");
+      const [summaryError, setSummaryError] = useState("");
+      const [summaryStatus, setSummaryStatus] = useState({ type: "", text: "" });
 
       useEffect(() => {
         const setupError = getSupabaseSetupError();
@@ -2449,6 +2983,11 @@
             setReviewLoadingId(null);
             setReviewError("");
             setReviewStatus({ type: "", text: "" });
+            setDailySummaries([]);
+            setSelectedDailySummaryDate(null);
+            setSummaryLoadingDate("");
+            setSummaryError("");
+            setSummaryStatus({ type: "", text: "" });
           }
         });
 
@@ -2461,16 +3000,40 @@
       useEffect(() => {
         if (!session?.user?.id || !supabaseClient) {
           setTrades([]);
+          setDailySummaries([]);
           setIsLoadingTrades(false);
           return;
         }
 
         fetchTrades();
+        fetchDailySummaries();
       }, [session?.user?.id]);
 
       const tradesWithResults = useMemo(() => {
         return trades.map(addTradeResults);
       }, [trades]);
+
+      const todayDate = getTodayDate();
+
+      const todayTradesWithResults = useMemo(() => {
+        return tradesWithResults.filter((trade) => trade.date === todayDate);
+      }, [todayDate, tradesWithResults]);
+
+      const todaySummaryMetrics = useMemo(() => {
+        return calculateStats(todayTradesWithResults);
+      }, [todayTradesWithResults]);
+
+      const selectedDailySummary = useMemo(() => {
+        if (!selectedDailySummaryDate) {
+          return null;
+        }
+
+        return dailySummaries.find((summary) => summary.summaryDate === selectedDailySummaryDate) || null;
+      }, [dailySummaries, selectedDailySummaryDate]);
+
+      const todayDailySummary = useMemo(() => {
+        return dailySummaries.find((summary) => summary.summaryDate === todayDate) || null;
+      }, [dailySummaries, todayDate]);
 
       const selectedReviewTrade = useMemo(() => {
         if (!reviewTradeId) {
@@ -2692,6 +3255,34 @@
         }
       }
 
+      async function fetchDailySummaries() {
+        if (!session?.user?.id || !supabaseClient) {
+          return;
+        }
+
+        setSummaryError("");
+
+        try {
+          const { data, error } = await supabaseClient
+            .from(DAILY_SUMMARIES_TABLE)
+            .select("*")
+            .eq("user_id", session.user.id)
+            .order("summary_date", { ascending: false })
+            .order("created_at", { ascending: false });
+
+          if (error) {
+            setSummaryError(`Could not load daily summary history: ${error.message}`);
+            setDailySummaries([]);
+            return;
+          }
+
+          setDailySummaries(sortDailySummaries((data || []).map(fromDailySummaryRow).filter(Boolean)));
+        } catch (error) {
+          setSummaryError("Could not connect to Supabase for daily summaries.");
+          setDailySummaries([]);
+        }
+      }
+
       function updateAuthField(event) {
         const { name, value } = event.target;
         setAuthForm((current) => ({ ...current, [name]: value }));
@@ -2777,6 +3368,11 @@
         setReviewLoadingId(null);
         setReviewError("");
         setReviewStatus({ type: "", text: "" });
+        setDailySummaries([]);
+        setSelectedDailySummaryDate(null);
+        setSummaryLoadingDate("");
+        setSummaryError("");
+        setSummaryStatus({ type: "", text: "" });
       }
 
       function updateField(event) {
@@ -3345,6 +3941,115 @@
         }
       }
 
+      function openDailySummary(summaryDate) {
+        setSelectedDailySummaryDate(summaryDate);
+        setSummaryError("");
+        setSummaryStatus({ type: "", text: "" });
+      }
+
+      function closeDailySummary() {
+        setSelectedDailySummaryDate(null);
+        setSummaryError("");
+        setSummaryStatus({ type: "", text: "" });
+      }
+
+      async function generateDailySummary(summaryDate = todayDate) {
+        if (!session?.user?.id || !supabaseClient) {
+          setSummaryError("Log in before generating daily summaries.");
+          setSummaryStatus({ type: "error", text: "Daily summary failed." });
+          return;
+        }
+
+        const dailyTrades = tradesWithResults.filter((trade) => trade.date === summaryDate);
+
+        if (dailyTrades.length === 0) {
+          setSelectedDailySummaryDate(summaryDate);
+          setSummaryError(`No trades were logged for ${summaryDate}.`);
+          setSummaryStatus({ type: "error", text: "Daily summary needs at least one trade." });
+          return;
+        }
+
+        const requestId = createTradeId();
+        const payload = buildDailySummaryPayload(summaryDate, tradesWithResults);
+
+        setSelectedDailySummaryDate(summaryDate);
+        setSummaryLoadingDate(summaryDate);
+        setSummaryError("");
+        setSummaryStatus({ type: "info", text: "Generating daily AI summary with Gemini..." });
+
+        try {
+          const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+          const accessToken = sessionData?.session?.access_token || session.access_token;
+
+          if (sessionError || !accessToken) {
+            throw new Error("Your Supabase session expired. Please log in again before generating summaries.");
+          }
+
+          const controller = new AbortController();
+          const timeoutId = window.setTimeout(() => controller.abort(), 50000);
+          let response;
+
+          try {
+            response = await fetch(DAILY_SUMMARY_ENDPOINT, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+                "X-Summary-Request-Id": requestId
+              },
+              body: JSON.stringify({
+                dailySummary: payload
+              }),
+              signal: controller.signal
+            });
+          } catch (error) {
+            if (error.name === "AbortError") {
+              throw new Error("Gemini daily summary timed out. Please try again.");
+            }
+
+            throw new Error("Could not reach the daily summary endpoint. Check the Vercel deployment and network connection.");
+          } finally {
+            window.clearTimeout(timeoutId);
+          }
+
+          const contentType = response.headers.get("content-type") || "";
+          const responseBody = contentType.includes("application/json")
+            ? await response.json().catch(() => ({}))
+            : {
+                error: "Daily summary endpoint returned non-JSON. Make sure /api/daily-summary is deployed as a Vercel serverless function."
+              };
+
+          if (!response.ok) {
+            const serverRequestId = responseBody.requestId ? ` Request ID: ${responseBody.requestId}.` : "";
+            throw new Error(`${responseBody.error || "Daily AI summary could not be generated."}${serverRequestId}`);
+          }
+
+          const summaryRow = responseBody.savedSummary
+            ? fromDailySummaryRow(responseBody.savedSummary)
+            : null;
+          const normalizedSummary = normalizeDailySummary(responseBody.summary, summaryDate, responseBody.summary?.generatedAt);
+          const nextSummary = summaryRow || {
+            id: responseBody.requestId || requestId,
+            userId: session.user.id,
+            summaryDate,
+            summary: normalizedSummary,
+            createdAt: normalizedSummary?.generatedAt || new Date().toISOString()
+          };
+
+          if (!nextSummary.summary) {
+            throw new Error("Daily summary endpoint returned no summary data.");
+          }
+
+          setDailySummaries((current) => upsertDailySummary(current, nextSummary));
+          setSummaryStatus({ type: "success", text: "Daily AI summary generated and saved to Supabase." });
+        } catch (error) {
+          setSummaryError(error.message || "Daily AI summary generation failed.");
+          setSummaryStatus({ type: "error", text: "Daily summary failed." });
+        } finally {
+          setSummaryLoadingDate("");
+        }
+      }
+
       const hasActiveFilters =
         filters.search.trim() ||
         filters.result !== "all" ||
@@ -3604,6 +4309,116 @@
                 accent={metrics.highRiskTrades ? "red" : "primary"}
                 valueClass={metrics.highRiskTrades ? "loss" : "neutral"}
               />
+            </div>
+          </section>
+
+          <section className="panel daily-summary-panel" aria-label="Daily AI trading summary">
+            <div className="panel-header">
+              <h2>Daily AI Summary</h2>
+              <span className="panel-meta">
+                {todayTradesWithResults.length} {todayTradesWithResults.length === 1 ? "trade" : "trades"} today
+              </span>
+            </div>
+            <div className="daily-summary-content">
+              <div className="daily-summary-today">
+                <div className="daily-summary-title">
+                  <strong>Today - {todayDate}</strong>
+                  <span>Gemini reviews today's trades, risk, emotions, and repeated process mistakes.</span>
+                </div>
+                <div className="daily-summary-metrics">
+                  <div className="daily-summary-metric">
+                    <span>Trades</span>
+                    <strong>{todaySummaryMetrics.totalTrades}</strong>
+                  </div>
+                  <div className="daily-summary-metric">
+                    <span>Total P/L</span>
+                    <strong className={getResultClass(todaySummaryMetrics.totalProfit)}>
+                      {formatMoney(todaySummaryMetrics.totalProfit, true)}
+                    </strong>
+                  </div>
+                  <div className="daily-summary-metric">
+                    <span>Win Rate</span>
+                    <strong>{formatWinRate(todaySummaryMetrics.winrate)}</strong>
+                  </div>
+                </div>
+
+                {summaryStatus.text && (
+                  <div className={`status-box status-${summaryStatus.type || "info"}`}>
+                    {summaryStatus.text}
+                  </div>
+                )}
+
+                {summaryError && (
+                  <div className="error-box">{summaryError}</div>
+                )}
+
+                <div className="daily-summary-actions">
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={() => generateDailySummary(todayDate)}
+                    disabled={todayTradesWithResults.length === 0 || Boolean(summaryLoadingDate)}
+                  >
+                    {summaryLoadingDate === todayDate && <span className="spinner"></span>}
+                    {summaryLoadingDate === todayDate
+                      ? "Generating..."
+                      : todayDailySummary
+                        ? "Regenerate Daily AI Summary"
+                        : "Generate Daily AI Summary"}
+                  </button>
+                  {todayDailySummary && (
+                    <button
+                      className="btn btn-secondary"
+                      type="button"
+                      onClick={() => openDailySummary(todayDate)}
+                    >
+                      View Today Summary
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="daily-summary-history">
+                <div className="daily-summary-title">
+                  <strong>Summary History</strong>
+                  <span>{dailySummaries.length} saved {dailySummaries.length === 1 ? "day" : "days"}</span>
+                </div>
+                {dailySummaries.length === 0 ? (
+                  <div className="empty-state">
+                    <strong>No summaries yet</strong>
+                    Generate today's summary after logging trades.
+                  </div>
+                ) : (
+                  <div className="daily-summary-history-list">
+                    {dailySummaries.map((summaryItem) => (
+                      <article className="daily-summary-history-item" key={summaryItem.summaryDate}>
+                        <div className="daily-summary-history-main">
+                          <strong>{summaryItem.summaryDate}</strong>
+                          <span>{summaryItem.summary.headline}</span>
+                        </div>
+                        <div className="daily-summary-history-actions">
+                          <button
+                            className="btn btn-secondary btn-small"
+                            type="button"
+                            onClick={() => openDailySummary(summaryItem.summaryDate)}
+                          >
+                            View
+                          </button>
+                          <button
+                            className="btn btn-primary btn-small"
+                            type="button"
+                            onClick={() => generateDailySummary(summaryItem.summaryDate)}
+                            disabled={Boolean(summaryLoadingDate)}
+                          >
+                            {summaryLoadingDate === summaryItem.summaryDate && <span className="spinner"></span>}
+                            {summaryLoadingDate === summaryItem.summaryDate ? "Regenerating..." : "Regenerate"}
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </section>
 
@@ -4141,6 +4956,74 @@
               )}
             </section>
           </section>
+
+          {selectedDailySummaryDate && (
+            <div
+              className="modal-backdrop"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Daily AI trading summary"
+              onClick={closeDailySummary}
+            >
+              <div className="modal-panel daily-summary-modal" onClick={(event) => event.stopPropagation()}>
+                <div className="modal-header">
+                  <div className="modal-title">
+                    <strong>Daily AI summary</strong>
+                    <span>{selectedDailySummaryDate}</span>
+                  </div>
+                  <button className="btn btn-secondary btn-small" type="button" onClick={closeDailySummary}>
+                    Close
+                  </button>
+                </div>
+                <div className="daily-summary-body">
+                  {summaryStatus.text && (
+                    <div className={`status-box status-${summaryStatus.type || "info"}`}>
+                      {summaryStatus.text}
+                    </div>
+                  )}
+
+                  {summaryError && (
+                    <div className="error-box">{summaryError}</div>
+                  )}
+
+                  {summaryLoadingDate === selectedDailySummaryDate && (
+                    <div className="ai-loading-card" aria-live="polite">
+                      <span className="spinner"></span>
+                      <strong>Generating daily summary...</strong>
+                      <span>Reviewing today's trades, emotions, risk, and process notes.</span>
+                    </div>
+                  )}
+
+                  {selectedDailySummary?.summary && (
+                    <DailySummaryContent summary={selectedDailySummary.summary} />
+                  )}
+
+                  {!selectedDailySummary?.summary && summaryLoadingDate !== selectedDailySummaryDate && (
+                    <div className="empty-state">
+                      <strong>No summary saved for this date</strong>
+                      Generate a summary for this date after logging trades.
+                    </div>
+                  )}
+
+                  <div className="daily-summary-actions">
+                    <button
+                      className="btn btn-primary"
+                      type="button"
+                      onClick={() => generateDailySummary(selectedDailySummaryDate)}
+                      disabled={Boolean(summaryLoadingDate)}
+                    >
+                      {summaryLoadingDate === selectedDailySummaryDate && <span className="spinner"></span>}
+                      {summaryLoadingDate === selectedDailySummaryDate
+                        ? "Generating..."
+                        : selectedDailySummary
+                          ? "Regenerate Summary"
+                          : "Generate Summary"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {selectedReviewTrade && (
             <div
